@@ -1,0 +1,21 @@
+# secrets
+.env
+.env.local
+*.pem
+*.key
+keypair*.json
+wallet*.json
+
+# rust / anchor
+target/
+.anchor/
+test-ledger/
+
+# node
+node_modules/
+dist/
+.next/
+*.log
+
+# os
+.DS_Store
