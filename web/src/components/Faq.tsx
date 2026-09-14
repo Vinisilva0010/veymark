@@ -22,7 +22,7 @@ const ITEMS = [
   },
   {
     q: "Why Solana and not another chain?",
-    a: "Because every individual part becomes its own token, and that only works where minting costs close to nothing. Compressed NFTs make a passport per unit economically viable down to a R$200 shock absorber. On most other networks the issuance cost alone rules out anything but luxury goods.",
+    a: "Because every individual part becomes its own token, and that only works where minting costs close to nothing. Compressed NFTs make a passport per unit economically viable down to a $200 shock absorber. On most other networks the issuance cost alone rules out anything but luxury goods.",
   },
   {
     q: "Does the buyer need an app or a wallet?",
