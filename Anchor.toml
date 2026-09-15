@@ -9,7 +9,7 @@ skip-lint = false
 veymark = "9tCeoRVp4MRZTM6hxtJp2Nd797i1Mf2JbwLgXE6JFZcp"
 
 [provider]
-cluster = "localnet"
+cluster = "devnet"
 wallet = "~/.config/solana/id.json"
 
 [scripts]
