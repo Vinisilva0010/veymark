@@ -21,7 +21,8 @@
     "paths": {
       "@/*": ["./src/*"],
       "@backend/*": ["../backend/src/*"]
-    }
+    },
+    "types": ["node", "styled-jsx"]
   },
   "include": [
     "next-env.d.ts",
