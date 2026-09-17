@@ -1,5 +1,5 @@
 import { randomBytes } from "crypto";
-import { generateSun, verifySun } from "../src/crypto/sun";
+import { generateSun, verifySun, deriveTagKeys } from "../src/crypto/sun";
 
 const metaReadKey = randomBytes(16);
 const macKey = randomBytes(16);
@@ -66,6 +66,39 @@ try {
 const tapHigh = generateSun(uid, 0xffffff, metaReadKey, macKey);
 const decodedHigh = verifySun(tapHigh.piccData, tapHigh.cmac, metaReadKey, macKey);
 check("max counter roundtrips", decodedHigh.counter === 0xffffff);
+
+
+// 8. Key derivation
+const master = randomBytes(16);
+const derived1 = deriveTagKeys(master);
+const derived2 = deriveTagKeys(master);
+
+check(
+  "derivation is deterministic",
+  Buffer.from(derived1.metaReadKey).equals(Buffer.from(derived2.metaReadKey)) &&
+    Buffer.from(derived1.macKey).equals(Buffer.from(derived2.macKey))
+);
+check(
+  "read key and mac key differ",
+  !Buffer.from(derived1.metaReadKey).equals(Buffer.from(derived1.macKey))
+);
+
+const otherMaster = deriveTagKeys(randomBytes(16));
+check(
+  "different master yields different keys",
+  !Buffer.from(derived1.metaReadKey).equals(Buffer.from(otherMaster.metaReadKey))
+);
+
+// Full flow with derived keys
+const dk = deriveTagKeys(master);
+const tapDerived = generateSun(uid, 7, dk.metaReadKey, dk.macKey);
+const decodedDerived = verifySun(
+  tapDerived.piccData,
+  tapDerived.cmac,
+  dk.metaReadKey,
+  dk.macKey
+);
+check("derived keys roundtrip", decodedDerived.counter === 7);
 
 console.log(failures === 0 ? "\nAll SUN tests passed" : `\n${failures} test(s) failed`);
 process.exit(failures === 0 ? 0 : 1);

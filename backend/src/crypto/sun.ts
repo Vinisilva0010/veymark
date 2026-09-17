@@ -171,3 +171,37 @@ export function verifySun(
 
   return { uid: bytesToHex(uid), counter };
 }
+
+/**
+ * Derives the two per-tag use keys from a single tag master key.
+ *
+ * A physical NTAG 424 holds separate keys for encrypting PICCData and for the
+ * CMAC. Rather than storing both, we store one master key per tag and derive
+ * the use keys from it — the same key diversification approach NXP describes
+ * in AN10922, and standard practice in production deployments. One secret per
+ * tag instead of two means less to protect and less to leak.
+ */
+export function deriveTagKeys(tagMasterKey: Uint8Array): {
+  metaReadKey: Uint8Array;
+  macKey: Uint8Array;
+} {
+  if (tagMasterKey.length !== 16) {
+    throw new Error("Tag master key must be 16 bytes");
+  }
+
+  // Distinct labels guarantee the two derived keys never collide.
+  const readLabel = new Uint8Array(16);
+  readLabel[0] = 0x01;
+  readLabel[1] = 0x52; // 'R' for read
+  readLabel[2] = 0x4b; // 'K' for key
+
+  const macLabel = new Uint8Array(16);
+  macLabel[0] = 0x01;
+  macLabel[1] = 0x4d; // 'M' for MAC
+  macLabel[2] = 0x4b;
+
+  return {
+    metaReadKey: cmac(readLabel, tagMasterKey),
+    macKey: cmac(macLabel, tagMasterKey),
+  };
+}
