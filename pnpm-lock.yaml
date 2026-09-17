@@ -23,6 +23,9 @@ importers:
       '@metaplex-foundation/umi-bundle-defaults':
         specifier: ^1.5.1
         version: 1.5.1(@metaplex-foundation/umi@1.5.1)(@solana/web3.js@1.99.0(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6))
+      '@noble/ciphers':
+        specifier: ^2.4.0
+        version: 2.4.0
       '@node-rs/argon2':
         specifier: ^2.2.1
         version: 2.2.1
@@ -222,6 +225,10 @@ packages:
 
   '@metaplex-foundation/umi@1.5.1':
     resolution: {integrity: sha512-ONRv5a0kv+23AMlR8oyFBHnjVg3o3N8pUfFcV4gzbg6OgZf87zHsPWBfED3OTJqx267v1bEn6d6DABXNFq9Z3A==}
+
+  '@noble/ciphers@2.4.0':
+    resolution: {integrity: sha512-AnjFn0Jv92laAkvMrghlFZq4qQCIN/4DxFV/eooqtC2YTjB7kBeLMS2T9KJX4Dn+ZVXLOwK0lSgqDtx9gvxtiw==}
+    engines: {node: '>= 20.19.0'}
 
   '@noble/curves@1.4.2':
     resolution: {integrity: sha512-TavHr8qycMChk8UwMld0ZDRvatedkzWfH8IiaeGCfymOP5i0hSCozz9vHOL0nkwk7HRMlFnAiKpS2jrUmSybcw==}
@@ -1344,6 +1351,8 @@ snapshots:
       '@metaplex-foundation/umi-options': 1.5.1
       '@metaplex-foundation/umi-public-keys': 1.5.1
       '@metaplex-foundation/umi-serializers': 1.5.1
+
+  '@noble/ciphers@2.4.0': {}
 
   '@noble/curves@1.4.2':
     dependencies:
