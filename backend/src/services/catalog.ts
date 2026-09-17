@@ -83,19 +83,30 @@ export async function createProduct(
     throw new Error("Model must be 120 characters or fewer");
   }
 
-  const rows = await query<Product>(
-    `INSERT INTO products (manufacturer_id, model, description, category)
-     VALUES ($1, $2, $3, $4)
-     RETURNING id, manufacturer_id, model, description, category, created_at`,
-    [
-      manufacturerId,
-      model,
-      input.description?.trim() || null,
-      input.category?.trim() || null,
-    ]
-  );
+  try {
+    const rows = await query<Product>(
+      `INSERT INTO products (manufacturer_id, model, description, category)
+       VALUES ($1, $2, $3, $4)
+       RETURNING id, manufacturer_id, model, description, category, created_at`,
+      [
+        manufacturerId,
+        model,
+        input.description?.trim() || null,
+        input.category?.trim() || null,
+      ]
+    );
 
-  return rows[0];
+    return rows[0];
+  } catch (err) {
+    // Translate database errors into messages safe to show a client. Raw
+    // Postgres errors leak schema details such as constraint names.
+    if (typeof err === "object" && err !== null && "code" in err) {
+      if ((err as { code: string }).code === "23505") {
+        throw new Error("A product with this model already exists");
+      }
+    }
+    throw new Error("Could not create product");
+  }
 }
 
 export async function deleteProduct(
