@@ -137,3 +137,39 @@ export async function purgeExpiredSessions(): Promise<number> {
   );
   return Number(rows[0]?.count ?? 0);
 }
+
+export interface ActiveSession {
+  id: string;
+  created_at: Date;
+  last_seen_at: Date;
+  expires_at: Date;
+  user_agent: string | null;
+  ip_address: string | null;
+}
+
+/** Lists a user's own active sessions so they can spot and cut unknown ones. */
+export async function listSessions(userId: string): Promise<ActiveSession[]> {
+  return query<ActiveSession>(
+    `SELECT id, created_at, last_seen_at, expires_at, user_agent,
+            host(ip_address) AS ip_address
+       FROM sessions
+      WHERE user_id = $1 AND expires_at > NOW()
+      ORDER BY last_seen_at DESC`,
+    [userId]
+  );
+}
+
+/**
+ * Revokes one session by id, scoped to its owner so a session id alone is
+ * not enough to cut someone else's access.
+ */
+export async function revokeSession(
+  sessionId: string,
+  userId: string
+): Promise<boolean> {
+  const rows = await query<{ id: string }>(
+    `DELETE FROM sessions WHERE id = $1 AND user_id = $2 RETURNING id`,
+    [sessionId, userId]
+  );
+  return rows.length > 0;
+}

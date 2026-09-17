@@ -109,6 +109,52 @@ export async function createProduct(
   }
 }
 
+export interface UpdateProductInput {
+  model?: string;
+  description?: string | null;
+  category?: string | null;
+}
+
+export async function updateProduct(
+  productId: string,
+  manufacturerId: string,
+  input: UpdateProductInput
+): Promise<Product | null> {
+  const model = input.model?.trim();
+  if (model !== undefined) {
+    if (!model) throw new Error("Model is required");
+    if (model.length > 120) {
+      throw new Error("Model must be 120 characters or fewer");
+    }
+  }
+
+  try {
+    const rows = await query<Product>(
+      `UPDATE products
+          SET model = COALESCE($3, model),
+              description = COALESCE($4, description),
+              category = COALESCE($5, category)
+        WHERE id = $1 AND manufacturer_id = $2
+        RETURNING id, manufacturer_id, model, description, category, created_at`,
+      [
+        productId,
+        manufacturerId,
+        model ?? null,
+        input.description?.trim() || null,
+        input.category?.trim() || null,
+      ]
+    );
+    return rows[0] ?? null;
+  } catch (err) {
+    if (typeof err === "object" && err !== null && "code" in err) {
+      if ((err as { code: string }).code === "23505") {
+        throw new Error("A product with this model already exists");
+      }
+    }
+    throw new Error("Could not update product");
+  }
+}
+
 export async function deleteProduct(
   productId: string,
   manufacturerId: string
@@ -116,11 +162,22 @@ export async function deleteProduct(
   // parts.product_id uses ON DELETE RESTRICT, so a product with provisioned
   // parts cannot be removed. That is intentional: deleting it would orphan
   // physical tags already in the field.
-  const rows = await query<{ id: string }>(
-    `DELETE FROM products
-      WHERE id = $1 AND manufacturer_id = $2
-      RETURNING id`,
-    [productId, manufacturerId]
-  );
-  return rows.length > 0;
+  try {
+    const rows = await query<{ id: string }>(
+      `DELETE FROM products
+        WHERE id = $1 AND manufacturer_id = $2
+        RETURNING id`,
+      [productId, manufacturerId]
+    );
+    return rows.length > 0;
+  } catch (err) {
+    if (typeof err === "object" && err !== null && "code" in err) {
+      if ((err as { code: string }).code === "23503") {
+        throw new Error(
+          "This product has provisioned parts and cannot be deleted"
+        );
+      }
+    }
+    throw new Error("Could not delete product");
+  }
 }
