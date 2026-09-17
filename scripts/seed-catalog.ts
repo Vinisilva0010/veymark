@@ -6,7 +6,7 @@
  */
 import "dotenv/config";
 import { randomBytes } from "crypto";
-import { pool, query } from "../backend/src/db/client";
+import { closePool, query } from "../backend/src/db/client";
 import { hashPassword } from "../backend/src/services/auth";
 
 async function main() {
@@ -54,11 +54,11 @@ async function main() {
   console.log("Password:    ", password);
   console.log("\nSave the password now — it is not stored anywhere.\n");
 
-  await pool.end();
+  await closePool();
 }
 
 main().catch(async (err) => {
   console.error(err);
-  await pool.end();
+  await closePool();
   process.exit(1);
 });
