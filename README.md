@@ -112,6 +112,12 @@ npx ts-node scripts/seed-catalog.ts
 cd web && npm run dev
 ```
 
+On WSL, PostgreSQL does not start automatically (no systemd). Start it with:
+
+```bash
+sudo pg_ctlcluster 16 main start && pg_isready
+```
+
 `SDM_MASTER_KEY` must be 32 random bytes as 64 hex characters
 (`openssl rand -hex 32`). Tag keys are encrypted at rest with it, so a database
 dump alone cannot forge taps.
