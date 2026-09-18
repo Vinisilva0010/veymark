@@ -1,0 +1,91 @@
+/**
+ * Passport minting.
+ *
+ * The mint authority keypair lives only here, server-side, loaded from the
+ * filesystem path in the environment. It is never exposed through an API and
+ * never reaches the browser: whoever can mint can create passports for parts
+ * that do not exist.
+ */
+import "dotenv/config";
+import { readFileSync } from "fs";
+import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
+import { keypairIdentity, publicKey, none } from "@metaplex-foundation/umi";
+import {
+  mintV2,
+  mplBubblegum,
+  parseLeafFromMintV2Transaction,
+} from "@metaplex-foundation/mpl-bubblegum";
+
+export interface PassportMetadata {
+  model: string;
+  batch: string;
+  manufacturerName: string;
+  chipUid: string;
+}
+
+let cachedUmi: ReturnType<typeof createUmi> | null = null;
+
+function getUmi() {
+  if (cachedUmi) return cachedUmi;
+
+  const rpcUrl = process.env.SOLANA_RPC_URL;
+  if (!rpcUrl) throw new Error("SOLANA_RPC_URL is not set");
+
+  const keypairPath = process.env.MINT_AUTHORITY_KEYPAIR_PATH;
+  if (!keypairPath) {
+    throw new Error("MINT_AUTHORITY_KEYPAIR_PATH is not set");
+  }
+
+  const umi = createUmi(rpcUrl).use(mplBubblegum());
+  const secret = new Uint8Array(JSON.parse(readFileSync(keypairPath, "utf-8")));
+  umi.use(keypairIdentity(umi.eddsa.createKeypairFromSecretKey(secret)));
+
+  cachedUmi = umi;
+  return umi;
+}
+
+/**
+ * Mints one passport and returns its asset id.
+ *
+ * The parse step retries because devnet RPCs routinely confirm a transaction
+ * before it is queryable, and failing there would mark a successful mint as
+ * failed — leaving an orphan passport and a part that retries forever.
+ */
+export async function mintPassport(
+  metadata: PassportMetadata
+): Promise<string> {
+  const treeAddress = process.env.MERKLE_TREE_ADDRESS;
+  if (!treeAddress) throw new Error("MERKLE_TREE_ADDRESS is not set");
+
+  const umi = getUmi();
+  const merkleTree = publicKey(treeAddress);
+
+  const { signature } = await mintV2(umi, {
+    leafOwner: umi.identity.publicKey,
+    merkleTree,
+    metadata: {
+      name: metadata.model.slice(0, 32),
+      uri: `${process.env.VERIFY_BASE_URL ?? "https://veymark.xyz"}/api/metadata/${metadata.chipUid}`,
+      sellerFeeBasisPoints: 0,
+      collection: none(),
+      creators: [],
+    },
+  }).sendAndConfirm(umi, { confirm: { commitment: "finalized" } });
+
+  let lastError: unknown;
+  for (let attempt = 1; attempt <= 10; attempt++) {
+    try {
+      const leaf = await parseLeafFromMintV2Transaction(umi, signature);
+      return leaf.id.toString();
+    } catch (err) {
+      lastError = err;
+      if (attempt < 10) {
+        await new Promise((resolve) => setTimeout(resolve, 3000));
+      }
+    }
+  }
+
+  throw new Error(
+    `Mint confirmed but asset id could not be read: ${String(lastError)}`
+  );
+}
