@@ -31,14 +31,37 @@ function getUmi() {
   const rpcUrl = process.env.SOLANA_RPC_URL;
   if (!rpcUrl) throw new Error("SOLANA_RPC_URL is not set");
 
+  // Serverless runtimes have no persistent filesystem, so the key comes from
+  // the environment there. The file path is kept for local development.
+  //
+  // This is acceptable for devnet, where the key holds no value. On mainnet
+  // the mint authority must live in a KMS or HSM: whoever holds it can mint
+  // passports for parts that were never manufactured.
+  const inlineKey = process.env.MINT_AUTHORITY_SECRET_KEY;
   const keypairPath = process.env.MINT_AUTHORITY_KEYPAIR_PATH;
-  if (!keypairPath) {
-    throw new Error("MINT_AUTHORITY_KEYPAIR_PATH is not set");
+
+  let secretJson: string;
+  if (inlineKey) {
+    secretJson = inlineKey;
+  } else if (keypairPath) {
+    secretJson = readFileSync(keypairPath, "utf-8");
+  } else {
+    throw new Error(
+      "Set MINT_AUTHORITY_SECRET_KEY or MINT_AUTHORITY_KEYPAIR_PATH"
+    );
+  }
+
+  const parsed = JSON.parse(secretJson);
+  if (!Array.isArray(parsed) || parsed.length !== 64) {
+    throw new Error("Mint authority key must be a 64-byte JSON array");
   }
 
   const umi = createUmi(rpcUrl).use(mplBubblegum());
-  const secret = new Uint8Array(JSON.parse(readFileSync(keypairPath, "utf-8")));
-  umi.use(keypairIdentity(umi.eddsa.createKeypairFromSecretKey(secret)));
+  umi.use(
+    keypairIdentity(
+      umi.eddsa.createKeypairFromSecretKey(new Uint8Array(parsed))
+    )
+  );
 
   cachedUmi = umi;
   return umi;
