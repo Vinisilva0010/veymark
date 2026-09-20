@@ -73,3 +73,16 @@ Rule: show the thing running, not slides. Screen recording beats talking head.
 - [ ] Week 2 — simulator generating a valid tap, backend rejecting a replay live
 - [ ] Week 3 — three verification states, judge demo page
 - [ ] Week 4 — expansion layer + founder segment (22 years at GM)
+
+
+
+
+
+
+
+On-chain foundation is live on devnet. Manufacturer registry program, Bubblegum tree, and the first part passport minted as a compressed NFT.
+
+One decision worth explaining: registration is permissionless, verification is not. Anyone can create a manufacturer record; the verified flag only flips by admin action. Keeps onboarding open while making the trust signal separately auditable by anyone reading the chain.
+
+Program: 9tCeoRVp4MRZTM6hxtJp2Nd797i1Mf2JbwLgXE6JFZcp
+First passport: E3FMgTHkTQQCPpswhxZ712o7Sr5T6H1g41ypvJvTrK8d
