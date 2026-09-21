@@ -10,6 +10,7 @@ import "dotenv/config";
 import { readFileSync } from "fs";
 import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
 import { keypairIdentity, publicKey, none } from "@metaplex-foundation/umi";
+import { base58 } from "@metaplex-foundation/umi/serializers";
 import {
   mintV2,
   mplBubblegum,
@@ -74,9 +75,15 @@ function getUmi() {
  * before it is queryable, and failing there would mark a successful mint as
  * failed — leaving an orphan passport and a part that retries forever.
  */
+export interface MintResult {
+  assetId: string;
+  /** Base58 transaction signature — the on-chain proof explorers can render. */
+  signature: string;
+}
+
 export async function mintPassport(
   metadata: PassportMetadata
-): Promise<string> {
+): Promise<MintResult> {
   const treeAddress = process.env.MERKLE_TREE_ADDRESS;
   if (!treeAddress) throw new Error("MERKLE_TREE_ADDRESS is not set");
 
@@ -99,7 +106,10 @@ export async function mintPassport(
   for (let attempt = 1; attempt <= 10; attempt++) {
     try {
       const leaf = await parseLeafFromMintV2Transaction(umi, signature);
-      return leaf.id.toString();
+      return {
+        assetId: leaf.id.toString(),
+        signature: base58.deserialize(signature)[0],
+      };
     } catch (err) {
       lastError = err;
       if (attempt < 10) {

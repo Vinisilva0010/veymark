@@ -100,7 +100,7 @@ export async function provisionPart(
   // still gets the key so the tag can be written, and the retry job will
   // finish the job.
   try {
-    const assetId = await mintPassport({
+    const { assetId, signature } = await mintPassport({
       model: products[0].model,
       batch,
       manufacturerName: products[0].manufacturer_name,
@@ -110,12 +110,13 @@ export async function provisionPart(
     await query(
       `UPDATE parts
           SET asset_id = $2,
+              mint_signature = $3,
               mint_status = 'minted',
               mint_attempts = mint_attempts + 1,
               mint_last_attempt_at = NOW(),
               mint_last_error = NULL
         WHERE id = $1`,
-      [partId, assetId]
+      [partId, assetId, signature]
     );
 
     return {
@@ -191,7 +192,7 @@ export async function retryMint(partId: string): Promise<string | null> {
   if (rows.length === 0) return null;
 
   try {
-    const assetId = await mintPassport({
+    const { assetId, signature } = await mintPassport({
       model: rows[0].model,
       batch: rows[0].batch,
       manufacturerName: rows[0].manufacturer_name,
@@ -200,11 +201,11 @@ export async function retryMint(partId: string): Promise<string | null> {
 
     await query(
       `UPDATE parts
-          SET asset_id = $2, mint_status = 'minted',
+          SET asset_id = $2, mint_signature = $3, mint_status = 'minted',
               mint_attempts = mint_attempts + 1,
               mint_last_attempt_at = NOW(), mint_last_error = NULL
         WHERE id = $1`,
-      [partId, assetId]
+      [partId, assetId, signature]
     );
 
     return assetId;
