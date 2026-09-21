@@ -25,6 +25,7 @@ export interface VerificationResponse {
     manufacturerName: string;
     manufacturerVerified: boolean;
     assetId: string | null;
+    mintSignature: string | null;
   } | null;
   /** True when this is the first successful verification of this tag. */
   firstVerification: boolean;
@@ -38,6 +39,7 @@ interface PartRow {
   chip_uid: string;
   sdm_key_encrypted: Buffer;
   asset_id: string | null;
+  mint_signature: string | null;
   batch: string;
   status: string;
   last_counter: string;
@@ -97,7 +99,8 @@ export async function verifyTap(
   // payload; at pilot scale this is fine, and phase 4 adds a UID hint column
   // if the table grows.
   const rows = await query<PartRow>(
-    `SELECT p.id, p.chip_uid, p.sdm_key_encrypted, p.asset_id, p.batch,
+    `SELECT p.id, p.chip_uid, p.sdm_key_encrypted, p.asset_id,
+            p.mint_signature, p.batch,
             p.status, p.last_counter::text AS last_counter, p.provisioned_at,
             pr.model, pr.description,
             m.name AS manufacturer_name,
@@ -202,6 +205,7 @@ export async function verifyTap(
       manufacturerName: matched.manufacturer_name,
       manufacturerVerified: matched.manufacturer_verified,
       assetId: matched.asset_id,
+      mintSignature: matched.mint_signature,
     },
     firstVerification: previousCount === 0,
     verificationCount: previousCount + 1,

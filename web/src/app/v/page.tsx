@@ -16,17 +16,25 @@ type VerificationResponse = {
     manufacturerName: string;
     manufacturerVerified: boolean;
     assetId: string | null;
+    mintSignature: string | null;
   } | null;
   firstVerification: boolean;
   verificationCount: number;
   alertReason?: string;
 };
 
-function explorerUrl(assetId: string) {
-  // XRAY is used instead of Solscan: Solscan does not index compressed NFTs
-  // on devnet, so the link would open an empty page — the opposite of what a
-  // proof link is for.
-  return `https://xray.helius.xyz/token/${assetId}?network=devnet`;
+const TREE_ADDRESS = "3uvL6ntvFq1iqBoNnEjPymcD6TQP1suTqjQFy7sam9hk";
+
+function proofUrl(mintSignature: string | null) {
+  // A compressed NFT is not an account, so explorers looking up the asset id
+  // as an address show an empty page. The mint transaction is a real on-chain
+  // object every explorer renders, with the Bubblegum instruction and the part
+  // metadata inside. Parts minted before signatures were stored fall back to
+  // the Merkle tree account, which is also real and public.
+  if (mintSignature) {
+    return `https://explorer.solana.com/tx/${mintSignature}?cluster=devnet`;
+  }
+  return `https://explorer.solana.com/address/${TREE_ADDRESS}?cluster=devnet`;
 }
 
 function formatDate(iso: string) {
@@ -184,9 +192,9 @@ function VerifyContent() {
         {data.chainStatus === "confirmed" ? (
           <>
             <span>Public record confirmed on Solana</span>
-            {part.assetId && (
+            {(part.mintSignature || part.assetId) && (
               
-              <a  href={explorerUrl(part.assetId)}
+              <a  href={proofUrl(part.mintSignature)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="vm-v-link"
