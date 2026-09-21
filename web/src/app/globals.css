@@ -399,3 +399,238 @@
     transition: none;
   }
 }
+
+/* ---------------------------------------------------------------------------
+   Public verification page (/v). This is what a tag opens in the browser.
+   Single column, centred, sized for a phone held at a counter.
+   --------------------------------------------------------------------------- */
+
+.vm-v {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 18px 48px;
+  background: #fdf9eb;
+}
+
+.vm-v-card {
+  width: 100%;
+  max-width: 420px;
+  background: #fffdf7;
+  border: 1px solid rgba(80, 4, 20, 0.12);
+  border-radius: 20px;
+  padding: 30px 22px 22px;
+  text-align: center;
+  box-shadow: 0 10px 40px rgba(80, 4, 20, 0.06);
+}
+
+.vm-v-spin {
+  width: 34px;
+  height: 34px;
+  margin: 24px auto;
+  border-radius: 50%;
+  border: 3px solid rgba(80, 4, 20, 0.14);
+  border-top-color: #f73962;
+  animation: vm-v-rot 0.9s linear infinite;
+}
+@keyframes vm-v-rot {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.vm-v-loading {
+  font-size: 14px;
+  color: rgba(80, 4, 20, 0.6);
+}
+
+.vm-v-eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(80, 4, 20, 0.5);
+}
+/* The manufacturer's name is the one the buyer trusts, so it leads. */
+.vm-v-maker {
+  margin-top: 4px;
+  font-size: 19px;
+  font-weight: 700;
+  color: #500414;
+}
+
+.vm-v-badge {
+  width: 62px;
+  height: 62px;
+  margin: 20px auto 0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  font-weight: 800;
+  color: #fff;
+}
+.vm-v-badge.is-ok {
+  background: #18824a;
+}
+.vm-v-badge.is-warn {
+  background: #d9a514;
+}
+.vm-v-badge.is-alert {
+  background: #e06a15;
+}
+
+.vm-v-title {
+  margin-top: 12px;
+  font-size: 22px;
+  font-weight: 800;
+  color: #500414;
+}
+
+.vm-v-body {
+  margin-top: 8px;
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: rgba(80, 4, 20, 0.72);
+}
+
+.vm-v-chip {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 5px 13px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #18824a;
+  background: rgba(24, 130, 74, 0.12);
+}
+
+.vm-v-first {
+  margin-top: 8px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: rgba(80, 4, 20, 0.55);
+}
+
+.vm-v-data {
+  margin-top: 20px;
+  text-align: left;
+}
+.vm-v-data > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-top: 1px solid rgba(80, 4, 20, 0.1);
+}
+.vm-v-data dt {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(80, 4, 20, 0.5);
+}
+.vm-v-data dd {
+  font-size: 14.5px;
+  font-weight: 600;
+  color: #500414;
+  text-align: right;
+  word-break: break-word;
+}
+
+.vm-v-chain {
+  margin-top: 16px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+}
+.vm-v-chain.is-ok {
+  background: rgba(24, 130, 74, 0.09);
+  color: #18824a;
+}
+.vm-v-chain.is-pending {
+  background: rgba(217, 165, 20, 0.12);
+  color: #8a6a0d;
+}
+.vm-v-link {
+  font-size: 13px;
+  font-weight: 700;
+  color: #f73962;
+  text-decoration: none;
+}
+.vm-v-link:hover {
+  text-decoration: underline;
+}
+.vm-v-retry {
+  align-self: center;
+  min-height: 34px;
+  padding: 0 14px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #8a6a0d;
+  background: none;
+  border: 1.5px solid rgba(138, 106, 13, 0.35);
+  border-radius: 9px;
+  cursor: pointer;
+}
+
+.vm-v-note {
+  margin-top: 16px;
+  padding: 13px 15px;
+  border-radius: 12px;
+  background: rgba(80, 4, 20, 0.05);
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: rgba(80, 4, 20, 0.75);
+  text-align: left;
+}
+
+.vm-v-explain-btn {
+  width: 100%;
+  min-height: 44px;
+  margin-top: 16px;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #500414;
+  background: none;
+  border: 1.5px solid rgba(80, 4, 20, 0.18);
+  border-radius: 11px;
+  cursor: pointer;
+}
+.vm-v-explain-btn:hover {
+  border-color: #f73962;
+  color: #f73962;
+}
+
+.vm-v-explain {
+  margin-top: 10px;
+  padding: 14px 15px;
+  border-radius: 12px;
+  background: rgba(80, 4, 20, 0.04);
+  text-align: left;
+}
+.vm-v-explain p {
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: rgba(80, 4, 20, 0.75);
+}
+.vm-v-explain p + p {
+  margin-top: 10px;
+}
+
+.vm-v-foot {
+  margin-top: 20px;
+  font-size: 11.5px;
+  color: rgba(80, 4, 20, 0.42);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vm-v-spin {
+    animation: none;
+  }
+}
