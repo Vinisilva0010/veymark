@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, Suspense } from "react";
+import { useEffect, useRef, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 
 type ChainStatus = "confirmed" | "unavailable" | "mismatch";
@@ -47,7 +47,16 @@ function VerifyContent() {
   const piccData = params.get("picc_data");
   const cmac = params.get("cmac");
 
+  // Each tap URL is single-use: the counter advances on the first request, so
+  // a second call is correctly rejected as a replay. React Strict Mode runs
+  // effects twice in development, and prefetching or a reload would do the
+  // same — so the request is guarded to fire exactly once per page load.
+  const requested = useRef(false);
+
   useEffect(() => {
+    if (requested.current) return;
+    requested.current = true;
+
     if (!piccData || !cmac) {
       setLoading(false);
       setFailed(true);
