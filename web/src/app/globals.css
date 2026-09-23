@@ -634,3 +634,330 @@
     animation: none;
   }
 }
+
+/* ---------------------------------------------------------------------------
+   Public test bench (/demo). A judge without a physical tag runs real taps
+   and tries to defeat them. The verdict lands as a stamp — the one loud
+   element; everything around it stays quiet.
+   --------------------------------------------------------------------------- */
+
+.bench {
+  min-height: 100vh;
+  background: #fdf9eb;
+  padding: 88px 18px 72px;
+  max-width: 760px;
+  margin: 0 auto;
+  color: #1a0208;
+}
+@media (min-width: 768px) {
+  .bench {
+    padding: 108px 32px 96px;
+  }
+}
+
+.bench-kicker {
+  font-family: ui-monospace, "Space Mono", monospace;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: #f73962;
+}
+
+.bench-title {
+  margin-top: 10px;
+  font-size: 46px;
+  font-weight: 900;
+  line-height: 0.88;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+  color: #1a0208;
+}
+@media (min-width: 768px) {
+  .bench-title {
+    font-size: 68px;
+  }
+}
+
+.bench-lede {
+  margin-top: 18px;
+  max-width: 54ch;
+  font-size: 16.5px;
+  font-weight: 500;
+  line-height: 1.55;
+  color: #2b0a12;
+}
+
+.bench-step {
+  margin-top: 44px;
+}
+.bench-step-title {
+  font-size: 15px;
+  font-weight: 800;
+  color: #1a0208;
+  padding-bottom: 10px;
+  border-bottom: 3px solid #1a0208;
+}
+
+/* Parts */
+.bench-parts {
+  margin-top: 18px;
+  display: grid;
+  gap: 12px;
+}
+@media (min-width: 640px) {
+  .bench-parts {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+.bench-part {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 15px 14px;
+  text-align: left;
+  background: #fffdf7;
+  border: 3px solid #1a0208;
+  border-radius: 4px;
+  cursor: pointer;
+  box-shadow: 5px 5px 0 0 #1a0208;
+  transition: transform 0.12s, box-shadow 0.12s;
+}
+.bench-part:hover {
+  transform: translate(2px, 2px);
+  box-shadow: 3px 3px 0 0 #1a0208;
+}
+.bench-part.is-on {
+  background: #f73962;
+  color: #fff;
+}
+.bench-part-model {
+  font-size: 15.5px;
+  font-weight: 800;
+}
+.bench-part-meta {
+  font-size: 12.5px;
+  font-weight: 600;
+  opacity: 0.75;
+}
+.bench-part-uid {
+  margin-top: 2px;
+  font-family: ui-monospace, monospace;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  opacity: 0.7;
+}
+
+/* Actions */
+.bench-actions {
+  margin-top: 18px;
+  display: grid;
+  gap: 12px;
+}
+.bench-btn {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  min-height: 64px;
+  padding: 12px 16px;
+  text-align: left;
+  background: #fffdf7;
+  border: 3px solid #1a0208;
+  border-radius: 4px;
+  cursor: pointer;
+  box-shadow: 6px 6px 0 0 #1a0208;
+  transition: transform 0.12s, box-shadow 0.12s;
+}
+/* The button presses in, like a physical switch. */
+.bench-btn:hover:not(:disabled) {
+  transform: translate(3px, 3px);
+  box-shadow: 3px 3px 0 0 #1a0208;
+}
+.bench-btn:active:not(:disabled) {
+  transform: translate(6px, 6px);
+  box-shadow: 0 0 0 0 #1a0208;
+}
+.bench-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.bench-btn.is-primary {
+  background: #f73962;
+  color: #fff;
+}
+.bench-btn-n {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: ui-monospace, monospace;
+  font-size: 14px;
+  font-weight: 800;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+}
+.bench-btn strong {
+  display: block;
+  font-size: 16px;
+  font-weight: 800;
+}
+.bench-btn em {
+  display: block;
+  margin-top: 2px;
+  font-size: 13px;
+  font-weight: 600;
+  font-style: normal;
+  opacity: 0.8;
+}
+
+.bench-error {
+  margin-top: 14px;
+  padding: 12px 14px;
+  font-size: 14.5px;
+  font-weight: 700;
+  color: #fff;
+  background: #1a0208;
+  border-radius: 4px;
+}
+
+.bench-working {
+  margin-top: 20px;
+  font-family: ui-monospace, monospace;
+  font-size: 14px;
+  font-weight: 700;
+  color: #2b0a12;
+}
+
+/* Result slip */
+.bench-slip {
+  margin-top: 20px;
+  padding: 26px 18px 20px;
+  background: #fffdf7;
+  border: 3px solid #1a0208;
+  border-radius: 4px;
+  box-shadow: 8px 8px 0 0 #1a0208;
+}
+
+/* The one loud element. Tilted like a rubber stamp, echoing the wax seal. */
+.bench-stamp {
+  display: inline-block;
+  padding: 8px 20px;
+  font-size: 30px;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  border: 4px solid currentColor;
+  border-radius: 3px;
+  transform: rotate(-3deg);
+}
+@media (min-width: 640px) {
+  .bench-stamp {
+    font-size: 40px;
+    padding: 10px 26px;
+  }
+}
+.bench-stamp.is-authentic {
+  color: #0f6b39;
+}
+.bench-stamp.is-alert {
+  color: #f73962;
+}
+.bench-stamp.is-unverified {
+  color: #9a6c05;
+}
+
+.bench-lines {
+  margin-top: 24px;
+}
+.bench-lines p {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 0;
+  border-top: 2px solid rgba(26, 2, 8, 0.15);
+  font-size: 15px;
+}
+.bench-lines span:first-child {
+  font-weight: 600;
+  color: #2b0a12;
+}
+.bench-lines span:last-child {
+  font-weight: 800;
+  text-align: right;
+  color: #1a0208;
+}
+
+.bench-reason {
+  margin-top: 20px;
+  font-size: 15.5px;
+  font-weight: 600;
+  line-height: 1.55;
+  color: #2b0a12;
+}
+
+.bench-payload {
+  margin-top: 22px;
+  padding: 14px;
+  background: #1a0208;
+  border-radius: 4px;
+  overflow-x: auto;
+}
+.bench-payload-label {
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: #f7c8d3;
+  margin-bottom: 8px;
+}
+.bench-payload code {
+  display: block;
+  font-family: ui-monospace, monospace;
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1.85;
+  color: #fdf9eb;
+  white-space: nowrap;
+}
+
+.bench-proof {
+  display: inline-block;
+  margin-top: 18px;
+  padding: 11px 16px;
+  font-size: 14.5px;
+  font-weight: 800;
+  color: #1a0208;
+  background: #fdf9eb;
+  border: 3px solid #1a0208;
+  border-radius: 4px;
+  text-decoration: none;
+  box-shadow: 4px 4px 0 0 #1a0208;
+  transition: transform 0.12s, box-shadow 0.12s;
+}
+.bench-proof:hover {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 0 #1a0208;
+}
+
+.bench-foot {
+  margin-top: 52px;
+  padding-top: 20px;
+  border-top: 3px solid #1a0208;
+}
+.bench-foot p {
+  max-width: 56ch;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.55;
+  color: #2b0a12;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bench-part,
+  .bench-btn,
+  .bench-proof {
+    transition: none;
+  }
+}
