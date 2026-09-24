@@ -255,3 +255,22 @@ export async function provisionDemoPart(
     };
   }
 }
+
+/**
+ * Removes demo parts visitors created more than a day ago.
+ *
+ * The on-chain passports stay where they are — a Merkle tree does not free
+ * space when a leaf is forgotten. This keeps the database and the parts list
+ * clean; the tree's capacity is protected by the rate limits above, not by
+ * this. The three seeded demo parts are never touched.
+ */
+export async function purgeOldDemoParts(): Promise<number> {
+  const rows = await query<{ id: string }>(
+    `DELETE FROM parts
+      WHERE is_demo = TRUE
+        AND provisioned_by = 'demo-visitor'
+        AND provisioned_at < NOW() - INTERVAL '1 day'
+      RETURNING id`
+  );
+  return rows.length;
+}
