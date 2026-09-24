@@ -88,3 +88,170 @@ export async function generateDemoTap(
   const payload = generateSun(chipUid, counter, keys.metaReadKey, keys.macKey);
   return { ...payload, counter, mode };
 }
+
+/**
+ * Live provisioning for the demo page.
+ *
+ * A visitor can watch a part being registered and its passport minted on
+ * Solana for real. Three things keep that safe:
+ *
+ *   1. It mints into a separate Merkle tree. A tree's capacity is fixed when
+ *      it is created, so filling the production tree would permanently break
+ *      real provisioning.
+ *   2. Per-visitor and global daily caps. The global cap is the one that
+ *      holds even if someone rotates addresses.
+ *   3. Parts created here are flagged is_demo, so they can never be confused
+ *      with production stock and can be cleaned up.
+ */
+import { randomBytes as randomBytesForDemo } from "crypto";
+import { encryptKey } from "../crypto/keys";
+import { mintPassport } from "./minting";
+
+export const DEMO_LIMIT_PER_VISITOR = 3;
+export const DEMO_LIMIT_PER_DAY = 200;
+
+export interface DemoProvisionResult {
+  chipUid: string;
+  model: string;
+  batch: string;
+  manufacturerName: string;
+  /** Shown once, the way the factory station would hand it to the writer. */
+  tagKeyHex: string;
+  assetId: string | null;
+  mintSignature: string | null;
+  mintStatus: "minted" | "pending";
+}
+
+export class DemoLimitError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "DemoLimitError";
+  }
+}
+
+async function assertWithinLimits(visitorKey: string): Promise<void> {
+  const [perVisitor] = await query<{ count: string }>(
+    `SELECT COUNT(*)::text AS count
+       FROM demo_mints
+      WHERE visitor_key = $1 AND created_at > NOW() - INTERVAL '1 hour'`,
+    [visitorKey]
+  );
+
+  if (Number(perVisitor?.count ?? 0) >= DEMO_LIMIT_PER_VISITOR) {
+    throw new DemoLimitError(
+      "You have registered the maximum number of demo parts for now. Try again in an hour."
+    );
+  }
+
+  const [perDay] = await query<{ count: string }>(
+    `SELECT COUNT(*)::text AS count
+       FROM demo_mints
+      WHERE created_at > NOW() - INTERVAL '1 day'`
+  );
+
+  if (Number(perDay?.count ?? 0) >= DEMO_LIMIT_PER_DAY) {
+    throw new DemoLimitError(
+      "The demo has hit today's limit on new registrations. Verification below still works."
+    );
+  }
+}
+
+export async function provisionDemoPart(
+  visitorKey: string,
+  productId: string,
+  batch: string
+): Promise<DemoProvisionResult> {
+  await assertWithinLimits(visitorKey);
+
+  const cleanBatch = batch.trim().slice(0, 24) || "DEMO";
+
+  const [product] = await query<{
+    id: string;
+    model: string;
+    manufacturer_name: string;
+  }>(
+    `SELECT pr.id, pr.model, m.name AS manufacturer_name
+       FROM products pr
+       JOIN manufacturers m ON m.id = pr.manufacturer_id
+      WHERE pr.id = $1`,
+    [productId]
+  );
+
+  if (!product) throw new Error("Unknown product");
+
+  // A fresh UID per run, so every visitor registers their own part rather
+  // than colliding with someone else's.
+  const chipUid = (
+    "04" +
+    randomBytesForDemo(6).toString("hex").toUpperCase()
+  ).slice(0, 14);
+
+  const tagMasterKey = randomBytesForDemo(16);
+
+  const [part] = await query<{ id: string }>(
+    `INSERT INTO parts
+       (product_id, chip_uid, sdm_key_encrypted, batch,
+        provisioned_by, mint_status, is_demo)
+     VALUES ($1, $2, $3, $4, 'demo-visitor', 'pending', TRUE)
+     RETURNING id`,
+    [product.id, chipUid, encryptKey(tagMasterKey), cleanBatch]
+  );
+
+  await query(
+    `INSERT INTO demo_mints (visitor_key, part_id) VALUES ($1, $2)`,
+    [visitorKey, part.id]
+  );
+
+  try {
+    const { assetId, signature } = await mintPassport(
+      {
+        model: product.model,
+        batch: cleanBatch,
+        manufacturerName: product.manufacturer_name,
+        chipUid,
+      },
+      "demo"
+    );
+
+    await query(
+      `UPDATE parts
+          SET asset_id = $2, mint_signature = $3, mint_status = 'minted',
+              mint_attempts = mint_attempts + 1, mint_last_attempt_at = NOW()
+        WHERE id = $1`,
+      [part.id, assetId, signature]
+    );
+
+    return {
+      chipUid,
+      model: product.model,
+      batch: cleanBatch,
+      manufacturerName: product.manufacturer_name,
+      tagKeyHex: tagMasterKey.toString("hex"),
+      assetId,
+      mintSignature: signature,
+      mintStatus: "minted",
+    };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    await query(
+      `UPDATE parts
+          SET mint_attempts = mint_attempts + 1,
+              mint_last_attempt_at = NOW(), mint_last_error = $2
+        WHERE id = $1`,
+      [part.id, message.slice(0, 500)]
+    );
+
+    // The part is already verifiable by chip; only the public record is
+    // missing. The demo shows exactly this case as a step of its own.
+    return {
+      chipUid,
+      model: product.model,
+      batch: cleanBatch,
+      manufacturerName: product.manufacturer_name,
+      tagKeyHex: tagMasterKey.toString("hex"),
+      assetId: null,
+      mintSignature: null,
+      mintStatus: "pending",
+    };
+  }
+}

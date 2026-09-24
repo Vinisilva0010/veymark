@@ -42,13 +42,13 @@ async function main() {
   await builder.sendAndConfirm(umi);
 
   console.log("\n--- Tree created ---");
-  console.log("MERKLE_TREE_ADDRESS=" + merkleTree.publicKey.toString());
+  console.log("TREE_ADDRESS=" + merkleTree.publicKey.toString());
   console.log(
     "Explorer: https://explorer.solana.com/address/" +
       merkleTree.publicKey.toString() +
       "?cluster=devnet"
   );
-  console.log("\nCopy MERKLE_TREE_ADDRESS into your .env file.");
+  console.log("\nCopy this into .env as MERKLE_TREE_ADDRESS or DEMO_MERKLE_TREE_ADDRESS.");
 }
 
 main().catch((err) => {

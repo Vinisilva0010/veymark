@@ -81,11 +81,27 @@ export interface MintResult {
   signature: string;
 }
 
+export type TreeTarget = "production" | "demo";
+
 export async function mintPassport(
-  metadata: PassportMetadata
+  metadata: PassportMetadata,
+  target: TreeTarget = "production"
 ): Promise<MintResult> {
-  const treeAddress = process.env.MERKLE_TREE_ADDRESS;
-  if (!treeAddress) throw new Error("MERKLE_TREE_ADDRESS is not set");
+  // Demo mints go to a separate tree. A Merkle tree has a fixed capacity that
+  // cannot grow, so letting anonymous visitors mint into the production tree
+  // would let them fill it and break real provisioning permanently.
+  const treeAddress =
+    target === "demo"
+      ? process.env.DEMO_MERKLE_TREE_ADDRESS
+      : process.env.MERKLE_TREE_ADDRESS;
+
+  if (!treeAddress) {
+    throw new Error(
+      target === "demo"
+        ? "DEMO_MERKLE_TREE_ADDRESS is not set"
+        : "MERKLE_TREE_ADDRESS is not set"
+    );
+  }
 
   const umi = getUmi();
   const merkleTree = publicKey(treeAddress);
