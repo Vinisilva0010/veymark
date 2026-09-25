@@ -797,3 +797,1657 @@
     background-size: 100% 100%;
   }
 }
+
+
+/* ---------------------------------------------------------------------------
+   Demo — step 1: the operator signs in.
+   Text on the left, operator and phone on the right. The operator arrives
+   first, the phone follows, and sign-in fills with scroll.
+   --------------------------------------------------------------------------- */
+
+.si {
+  position: relative;
+  height: 300vh;
+}
+
+.si-sticky {
+  position: sticky;
+  top: 0;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  padding: 72px 20px;
+}
+
+.si-grid {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  gap: 30px;
+  align-items: center;
+}
+@media (min-width: 960px) {
+  .si-grid {
+    grid-template-columns: 0.85fr 1.15fr;
+    gap: 48px;
+  }
+}
+
+.si-tag {
+  font-family: ui-monospace, monospace;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #f73962;
+}
+.si-title {
+  margin-top: 10px;
+  font-size: 34px;
+  font-weight: 900;
+  line-height: 1.04;
+  letter-spacing: -0.025em;
+  color: #120308;
+}
+@media (min-width: 960px) {
+  .si-title {
+    font-size: 44px;
+  }
+}
+.si-body {
+  margin-top: 16px;
+  max-width: 44ch;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.55;
+  color: #120308;
+}
+
+/* ---- Scene ---- */
+
+.si-scene {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start;
+  gap: 0;
+  height: 62vh;
+  min-height: 400px;
+}
+@media (min-width: 960px) {
+  .si-scene {
+    height: 72vh;
+    min-height: 500px;
+  }
+}
+
+/* The operator sets the scale: he fills the height, and the phone is sized
+   from that same height so the two always read as standing together. */
+.si-operator {
+  /* No width cap: the image is free to grow to the scene height, which is
+     what keeps him the same scale as the phone beside him. */
+  height: 100%;
+  width: auto;
+  object-fit: contain;
+  object-position: bottom right;
+  opacity: 0;
+  transform: translateX(-26px);
+  transition: opacity 0.6s ease, transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.si-scene[data-operator="1"] .si-operator {
+  opacity: 1;
+  transform: none;
+}
+
+/* The phone stands beside him, sized to his body rather than to the text. */
+.si-phone {
+  flex-shrink: 0;
+  /* Sized from the scene width so the screen stays readable, and pulled in
+     close so it sits where his open hand is pointing. */
+  /* Height-based again, but taller, so it matches his upper body instead of
+     floating free of him. The negative margin tucks it against his hand. */
+  height: 62%;
+  width: auto;
+  aspect-ratio: 1 / 2;
+  align-self: center;
+  /* Lowered and pulled in so the screen sits exactly where his open hand
+     points, rather than floating above it. */
+  margin-bottom: -10%;
+  margin-left: -48%;
+  padding: 3%;
+  background: #120308;
+  border-radius: 22px;
+  box-shadow: 0 16px 34px rgba(18, 3, 8, 0.28);
+  opacity: 0;
+  transform: translateY(26px) scale(0.96);
+  transition: opacity 0.5s ease, transform 0.6s cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+.si-scene[data-phone="1"] .si-phone {
+  opacity: 1;
+  transform: none;
+}
+
+.si-screen {
+  height: 100%;
+  padding: 7% 6%;
+  background: #fdf9eb;
+  border-radius: 15px;
+  overflow: hidden;
+  container-type: inline-size;
+}
+
+/* Screen text scales with the phone, so it stays legible at any size. */
+.si-screen-brand {
+  font-size: 13cqw;
+  font-weight: 900;
+  line-height: 1;
+  color: #120308;
+}
+.si-screen-sub {
+  margin-top: 1.5cqw;
+  font-size: 6.5cqw;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #f73962;
+}
+
+.si-field {
+  margin-top: 9cqw;
+}
+.si-field-label {
+  font-size: 6cqw;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #46141d;
+}
+.si-field-box {
+  margin-top: 2.5cqw;
+  height: 13cqw;
+  padding: 0 4cqw;
+  display: flex;
+  align-items: center;
+  background: #fff;
+  border: 2px solid #120308;
+  border-radius: 3cqw;
+  overflow: hidden;
+}
+.si-fill {
+  display: block;
+  width: 100%;
+  height: 4cqw;
+  background: #120308;
+  border-radius: 1cqw;
+  transform-origin: left center;
+  transform: scaleX(0);
+}
+.si-fill.is-dots {
+  background-color: transparent;
+  background-image: repeating-linear-gradient(
+    to right,
+    #120308 0 4cqw,
+    transparent 4cqw 7cqw
+  );
+}
+
+.si-btn {
+  margin-top: 10cqw;
+  padding: 5cqw 0;
+  text-align: center;
+  font-size: 7cqw;
+  font-weight: 900;
+  color: #120308;
+  background: rgba(18, 3, 8, 0.12);
+  border-radius: 3.5cqw;
+  transition: background 0.3s, color 0.3s;
+}
+.si-btn.is-on {
+  color: #fff;
+  background: #0f6b39;
+}
+
+.si-token {
+  margin-top: 6cqw;
+  padding: 4cqw 4.5cqw;
+  border-radius: 3.5cqw;
+  background: rgba(15, 107, 57, 0.12);
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.4s, transform 0.4s;
+}
+.si-token.is-on {
+  opacity: 1;
+  transform: none;
+}
+.si-token span {
+  display: block;
+  font-size: 5cqw;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #0f6b39;
+}
+.si-token code {
+  display: block;
+  margin-top: 1cqw;
+  font-family: ui-monospace, monospace;
+  font-size: 5.2cqw;
+  font-weight: 700;
+  color: #120308;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .si-operator,
+  .si-phone,
+  .si-btn,
+  .si-token {
+    transition: none;
+  }
+}
+
+
+/* ---------------------------------------------------------------------------
+   Demo — step 2: the tag is read on the line.
+   The tag is the logo itself, large and with nothing drawn around it. The
+   phone starts to the right and crosses to it as the reader scrolls.
+   --------------------------------------------------------------------------- */
+
+.rt {
+  position: relative;
+  height: 320vh;
+}
+
+.rt-sticky {
+  position: sticky;
+  top: 0;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  padding: 64px 20px;
+}
+
+.rt-grid {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  gap: 28px;
+  align-items: center;
+}
+@media (min-width: 960px) {
+  .rt-grid {
+    grid-template-columns: 0.8fr 1.2fr;
+    gap: 48px;
+  }
+}
+
+.rt-tag {
+  font-family: ui-monospace, monospace;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #f73962;
+}
+.rt-title {
+  margin-top: 10px;
+  font-size: 32px;
+  font-weight: 900;
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+  color: #120308;
+}
+@media (min-width: 960px) {
+  .rt-title {
+    font-size: 42px;
+  }
+}
+.rt-body {
+  margin-top: 15px;
+  max-width: 44ch;
+  font-size: 17.5px;
+  font-weight: 700;
+  line-height: 1.55;
+  color: #120308;
+}
+.rt-mark {
+  color: #120308;
+  background-image: linear-gradient(
+    transparent 58%,
+    rgba(247, 57, 98, 0.45) 58%
+  );
+  background-repeat: no-repeat;
+  padding: 0 2px;
+}
+
+/* ---- Scene ---- */
+
+.rt-scene {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  height: 58vh;
+  min-height: 380px;
+}
+@media (min-width: 960px) {
+  .rt-scene {
+    height: 68vh;
+    min-height: 460px;
+  }
+}
+
+/* The tag: the logo on its own, big, no card or border around it. */
+.rt-logo {
+  width: 42%;
+  max-width: 230px;
+  height: auto;
+  flex-shrink: 0;
+}
+
+/* Waves come off the logo while the chip is being read. */
+.rt-waves {
+  position: absolute;
+  left: 21%;
+  top: 50%;
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+.rt-waves span {
+  position: absolute;
+  left: -34px;
+  top: -34px;
+  width: 68px;
+  height: 68px;
+  border: 3px solid #f73962;
+  border-radius: 50%;
+  opacity: 0;
+}
+.rt-scene[data-phase="1"] .rt-waves {
+  opacity: 1;
+}
+.rt-scene[data-phase="1"] .rt-waves span {
+  animation: rt-ping 1.3s ease-out infinite;
+}
+.rt-waves span:nth-child(2) {
+  animation-delay: 0.42s;
+}
+.rt-waves span:nth-child(3) {
+  animation-delay: 0.84s;
+}
+@keyframes rt-ping {
+  0% {
+    transform: scale(0.35);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(3.4);
+    opacity: 0;
+  }
+}
+
+/* The phone starts off to the right and crosses to the tag. */
+.rt-phone {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  width: 50%;
+  max-width: 260px;
+  aspect-ratio: 1 / 2;
+  padding: 3%;
+  background: #120308;
+  border-radius: 24px;
+  box-shadow: 0 18px 38px rgba(18, 3, 8, 0.28);
+  transform: translate(0, -50%) rotate(4deg);
+  transition: transform 0.8s cubic-bezier(0.25, 0.9, 0.3, 1);
+}
+/* Beat 1: it moves in beside the tag to read it. */
+.rt-scene[data-phase="1"] .rt-phone {
+  transform: translate(-34%, -50%) rotate(-2deg);
+}
+/* Beat 2: it settles back a little, number on screen. */
+.rt-scene[data-phase="2"] .rt-phone {
+  transform: translate(-16%, -50%) rotate(0deg);
+}
+
+.rt-screen {
+  height: 100%;
+  padding: 7% 6%;
+  display: flex;
+  flex-direction: column;
+  background: #fdf9eb;
+  border-radius: 16px;
+  overflow: hidden;
+  container-type: inline-size;
+}
+
+.rt-brand {
+  font-size: 7cqw;
+  font-weight: 900;
+  line-height: 1;
+  color: #120308;
+  padding-bottom: 4cqw;
+  border-bottom: 2px solid rgba(18, 3, 8, 0.14);
+}
+
+.rt-row {
+  padding: 4cqw 0;
+  border-bottom: 2px solid rgba(18, 3, 8, 0.08);
+}
+.rt-row span {
+  display: block;
+  font-size: 4.4cqw;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #46141d;
+}
+.rt-row strong {
+  display: block;
+  margin-top: 1cqw;
+  font-size: 5.6cqw;
+  font-weight: 900;
+  line-height: 1.2;
+  color: #120308;
+}
+.rt-mono {
+  font-family: ui-monospace, monospace;
+  letter-spacing: 0.02em;
+}
+
+.rt-status {
+  margin-top: auto;
+  padding: 4.6cqw 0;
+  text-align: center;
+  font-size: 5cqw;
+  font-weight: 900;
+  border-radius: 3cqw;
+  color: #46141d;
+  background: rgba(18, 3, 8, 0.08);
+  transition: background 0.35s, color 0.35s;
+}
+.rt-status.is-1 {
+  color: #fff;
+  background: #f73962;
+}
+.rt-status.is-2 {
+  color: #fff;
+  background: #0f6b39;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rt-phone,
+  .rt-status,
+  .rt-waves {
+    transition: none;
+  }
+  .rt-waves span {
+    animation: none;
+  }
+}
+
+
+/* ---------------------------------------------------------------------------
+   Demo — step 3: the part gets a secret, then it is sealed.
+   The key shows in the open once, then the padlock closes and it drops into
+   the database unreadable. Scroll-driven, nothing to click.
+   --------------------------------------------------------------------------- */
+
+.sc {
+  position: relative;
+  height: 320vh;
+}
+
+.sc-sticky {
+  position: sticky;
+  top: 0;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  padding: 64px 20px;
+}
+
+.sc-grid {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  gap: 28px;
+  align-items: center;
+}
+@media (min-width: 960px) {
+  .sc-grid {
+    grid-template-columns: 0.8fr 1.2fr;
+    gap: 48px;
+  }
+}
+
+.sc-tag {
+  font-family: ui-monospace, monospace;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #f73962;
+}
+.sc-title {
+  margin-top: 10px;
+  font-size: 32px;
+  font-weight: 900;
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+  color: #120308;
+}
+@media (min-width: 960px) {
+  .sc-title {
+    font-size: 42px;
+  }
+}
+.sc-body {
+  margin-top: 15px;
+  max-width: 44ch;
+  font-size: 17.5px;
+  font-weight: 700;
+  line-height: 1.55;
+  color: #120308;
+}
+.sc-mark {
+  color: #120308;
+  background-image: linear-gradient(
+    transparent 58%,
+    rgba(247, 57, 98, 0.45) 58%
+  );
+  background-repeat: no-repeat;
+  padding: 0 2px;
+}
+
+/* ---- Scene ---- */
+
+.sc-scene {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  height: 58vh;
+  min-height: 380px;
+}
+@media (min-width: 960px) {
+  .sc-scene {
+    height: 68vh;
+    min-height: 460px;
+  }
+}
+
+.sc-phone {
+  position: relative;
+  z-index: 2;
+  width: 52%;
+  max-width: 270px;
+  aspect-ratio: 1 / 2;
+  padding: 3%;
+  background: #120308;
+  border-radius: 24px;
+  box-shadow: 0 18px 38px rgba(18, 3, 8, 0.28);
+}
+
+.sc-screen {
+  height: 100%;
+  padding: 7% 6%;
+  display: flex;
+  flex-direction: column;
+  background: #fdf9eb;
+  border-radius: 16px;
+  overflow: hidden;
+  container-type: inline-size;
+}
+
+.sc-brand {
+  font-size: 7cqw;
+  font-weight: 900;
+  line-height: 1;
+  color: #120308;
+  padding-bottom: 4cqw;
+  border-bottom: 2px solid rgba(18, 3, 8, 0.14);
+}
+
+.sc-keybox {
+  margin-top: 5cqw;
+  padding: 4cqw;
+  border-radius: 3cqw;
+  background: rgba(18, 3, 8, 0.06);
+}
+.sc-keylabel {
+  display: block;
+  font-size: 4.2cqw;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #46141d;
+}
+.sc-key {
+  display: block;
+  margin-top: 2cqw;
+  font-family: ui-monospace, monospace;
+  font-size: 4.6cqw;
+  font-weight: 800;
+  line-height: 1.5;
+  word-break: break-all;
+  color: #120308;
+  transition: color 0.4s;
+}
+.sc-key.is-sealed {
+  color: rgba(18, 3, 8, 0.45);
+  letter-spacing: 0.08em;
+}
+
+/* The padlock closes as the key is sealed. */
+.sc-lockwrap {
+  margin-top: 6cqw;
+  text-align: center;
+}
+.sc-lock {
+  position: relative;
+  width: 16cqw;
+  height: 19cqw;
+  margin: 0 auto;
+}
+.sc-lock-body {
+  position: absolute;
+  bottom: 0;
+  width: 16cqw;
+  height: 11cqw;
+  border-radius: 2.6cqw;
+  background: rgba(18, 3, 8, 0.22);
+  transition: background 0.45s;
+}
+.sc-lock-shackle {
+  position: absolute;
+  top: 0;
+  left: 3cqw;
+  width: 10cqw;
+  height: 10cqw;
+  border: 2.6cqw solid rgba(18, 3, 8, 0.22);
+  border-bottom: none;
+  border-radius: 5cqw 5cqw 0 0;
+  /* Open at first: the shackle sits lifted clear of the body. */
+  transform: translateY(3.4cqw);
+  transition: transform 0.5s cubic-bezier(0.2, 0.9, 0.3, 1), border-color 0.45s;
+}
+.sc-scene[data-phase="1"] .sc-lock-body,
+.sc-scene[data-phase="2"] .sc-lock-body {
+  background: #0f6b39;
+}
+.sc-scene[data-phase="1"] .sc-lock-shackle,
+.sc-scene[data-phase="2"] .sc-lock-shackle {
+  border-color: #0f6b39;
+  transform: translateY(0);
+}
+.sc-lockcaption {
+  margin-top: 2.6cqw;
+  font-size: 4cqw;
+  font-weight: 900;
+  color: #46141d;
+}
+
+.sc-store {
+  margin-top: auto;
+  padding: 4.6cqw 0;
+  text-align: center;
+  font-size: 5cqw;
+  font-weight: 900;
+  border-radius: 3cqw;
+  color: #46141d;
+  background: rgba(18, 3, 8, 0.08);
+  transition: background 0.35s, color 0.35s;
+}
+.sc-store.is-1 {
+  color: #fff;
+  background: #f73962;
+}
+.sc-store.is-2 {
+  color: #fff;
+  background: #0f6b39;
+}
+
+/* The database sits to the right; the sealed key lands in it. */
+.sc-db {
+  position: absolute;
+  right: 4%;
+  top: 50%;
+  width: 34%;
+  max-width: 190px;
+  aspect-ratio: 3 / 4;
+  transform: translateY(-50%);
+  opacity: 0.35;
+  transition: opacity 0.5s;
+}
+.sc-scene[data-phase="2"] .sc-db {
+  opacity: 1;
+}
+.sc-db-top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 22%;
+  border-radius: 50%;
+  background: #120308;
+}
+.sc-db-ring {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 22%;
+  border-radius: 50%;
+  border: 5px solid #120308;
+  border-top-color: transparent;
+}
+.sc-db-ring:nth-of-type(2) {
+  top: 28%;
+}
+.sc-db-ring:nth-of-type(3) {
+  top: 54%;
+}
+.sc-db-rows {
+  position: absolute;
+  left: 14%;
+  right: 14%;
+  bottom: 8%;
+  display: grid;
+  gap: 8%;
+}
+.sc-db-rows span {
+  height: 7px;
+  border-radius: 99px;
+  background: rgba(18, 3, 8, 0.35);
+}
+.sc-scene[data-phase="2"] .sc-db-rows span:first-child {
+  background: #0f6b39;
+}
+
+/* The database: dim until the sealed row lands in it. */
+.sc-db {
+  position: absolute;
+  right: 3%;
+  top: 50%;
+  width: 32%;
+  max-width: 180px;
+  height: auto;
+  transform: translateY(-50%);
+  opacity: 0.3;
+  transition: opacity 0.5s;
+}
+.sc-scene[data-phase="2"] .sc-db {
+  opacity: 1;
+}
+.sc-db-body {
+  fill: #e6dcc6;
+  stroke: #120308;
+  stroke-width: 5;
+}
+.sc-db-top {
+  fill: #fffdf7;
+  stroke: #120308;
+  stroke-width: 5;
+}
+.sc-db-line {
+  fill: none;
+  stroke: #120308;
+  stroke-width: 5;
+}
+.sc-db-row {
+  fill: rgba(18, 3, 8, 0.28);
+}
+.sc-scene[data-phase="2"] .sc-db-row.is-new {
+  fill: #0f6b39;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sc-db,
+  .sc-key,
+  .sc-lock-body,
+  .sc-lock-shackle,
+  .sc-store,
+  .sc-db {
+    transition: none;
+  }
+}
+
+
+/* ---------------------------------------------------------------------------
+   Demo — shared layout for steps 2, 5 and 6 (catalogue, Solana, apply label).
+   Same text treatment as the earlier steps: dark, heavy, highlighted.
+   --------------------------------------------------------------------------- */
+
+.dstep {
+  position: relative;
+  height: 320vh;
+}
+.dstep-sticky {
+  position: sticky;
+  top: 0;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  padding: 64px 20px;
+}
+.dstep-grid {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  gap: 28px;
+  align-items: center;
+}
+@media (min-width: 960px) {
+  .dstep-grid {
+    grid-template-columns: 0.8fr 1.2fr;
+    gap: 48px;
+  }
+}
+.dstep-tag {
+  font-family: ui-monospace, monospace;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #f73962;
+}
+.dstep-title {
+  margin-top: 10px;
+  font-size: 32px;
+  font-weight: 900;
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+  color: #120308;
+}
+@media (min-width: 960px) {
+  .dstep-title {
+    font-size: 42px;
+  }
+}
+.dstep-body {
+  margin-top: 15px;
+  max-width: 44ch;
+  font-size: 17.5px;
+  font-weight: 700;
+  line-height: 1.55;
+  color: #120308;
+}
+.dstep-mark {
+  color: #120308;
+  background-image: linear-gradient(
+    transparent 58%,
+    rgba(247, 57, 98, 0.45) 58%
+  );
+  background-repeat: no-repeat;
+  padding: 0 2px;
+}
+
+/* ---------------------------------------------------------------------------
+   Step 2 — catalogue on a laptop, with another maker's list locked away.
+   --------------------------------------------------------------------------- */
+
+.ct-scene {
+  position: relative;
+  padding-bottom: 60px;
+}
+
+.ct-laptop {
+  width: 100%;
+  max-width: 560px;
+}
+.ct-screen {
+  aspect-ratio: 16 / 10;
+  padding: 4.5%;
+  background: #fdf9eb;
+  border: 12px solid #120308;
+  border-radius: 16px 16px 4px 4px;
+  container-type: inline-size;
+  overflow: hidden;
+}
+.ct-base {
+  height: 16px;
+  width: 112%;
+  margin-left: -6%;
+  background: #120308;
+  border-radius: 0 0 16px 16px;
+}
+
+.ct-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding-bottom: 3cqw;
+  border-bottom: 2px solid rgba(18, 3, 8, 0.14);
+}
+.ct-brand {
+  font-size: 5cqw;
+  font-weight: 900;
+  color: #120308;
+}
+.ct-owner {
+  font-size: 2.8cqw;
+  font-weight: 900;
+  color: #f73962;
+}
+
+/* Products slide in one after another as the reader scrolls. */
+.ct-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 2cqw;
+  padding: 3.2cqw 0;
+  border-bottom: 2px solid rgba(18, 3, 8, 0.08);
+  opacity: 0;
+  transform: translateX(-24px);
+  transition: opacity 0.45s ease, transform 0.55s cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+.ct-row.is-in {
+  opacity: 1;
+  transform: none;
+}
+.ct-row strong {
+  font-size: 3.7cqw;
+  font-weight: 900;
+  color: #120308;
+}
+.ct-row span {
+  font-size: 2.9cqw;
+  font-weight: 800;
+  color: #46141d;
+  padding: 0.8cqw 2cqw;
+  background: rgba(247, 57, 98, 0.12);
+  border-radius: 99px;
+}
+
+/* Another manufacturer's catalogue: blurred, locked, out of reach. */
+.ct-other {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 44%;
+  max-width: 230px;
+  padding: 14px;
+  background: #fffdf7;
+  border: 3px solid #120308;
+  border-radius: 14px;
+  box-shadow: 6px 6px 0 0 #120308;
+  opacity: 0;
+  transform: translateY(24px) rotate(4deg);
+  transition: opacity 0.5s ease, transform 0.6s cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+.ct-other.is-in {
+  opacity: 1;
+  transform: rotate(2deg);
+}
+.ct-other-title {
+  font-size: 13px;
+  font-weight: 900;
+  color: #120308;
+}
+.ct-other-rows {
+  margin-top: 10px;
+  display: grid;
+  gap: 8px;
+  filter: blur(3px);
+}
+.ct-other-rows span {
+  height: 11px;
+  border-radius: 99px;
+  background: rgba(18, 3, 8, 0.4);
+}
+.ct-other-lock {
+  position: absolute;
+  inset: 34px 0 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.ct-other-shackle {
+  width: 22px;
+  height: 18px;
+  border: 5px solid #120308;
+  border-bottom: none;
+  border-radius: 12px 12px 0 0;
+}
+.ct-other-body {
+  width: 34px;
+  height: 24px;
+  background: #f73962;
+  border: 3px solid #120308;
+  border-radius: 6px;
+}
+.ct-other-lock p {
+  margin-top: 5px;
+  font-size: 12px;
+  font-weight: 900;
+  color: #120308;
+}
+
+/* ---------------------------------------------------------------------------
+   Step 5 — the passport is stamped with the seal, then joins the chain.
+   --------------------------------------------------------------------------- */
+
+.mt-scene {
+  position: relative;
+  height: 58vh;
+  min-height: 400px;
+}
+@media (min-width: 960px) {
+  .mt-scene {
+    height: 68vh;
+    min-height: 480px;
+  }
+}
+
+.mt-passport {
+  position: absolute;
+  left: 4%;
+  top: 6%;
+  width: 58%;
+  max-width: 320px;
+  padding: 20px 18px 24px;
+  background: #fffdf7;
+  border: 4px solid #120308;
+  border-radius: 16px;
+  box-shadow: 8px 8px 0 0 #120308;
+  transition: transform 0.8s cubic-bezier(0.5, 0, 0.3, 1), opacity 0.5s ease;
+}
+.mt-passport-title {
+  font-size: 20px;
+  font-weight: 900;
+  color: #120308;
+  padding-bottom: 10px;
+  border-bottom: 3px solid #120308;
+}
+.mt-field {
+  padding: 10px 0;
+  border-bottom: 2px solid rgba(18, 3, 8, 0.12);
+}
+.mt-field span {
+  display: block;
+  font-size: 11.5px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: #46141d;
+}
+.mt-field strong {
+  display: block;
+  margin-top: 2px;
+  font-size: 16px;
+  font-weight: 900;
+  color: #120308;
+}
+
+/* The seal drops from above and lands with an impact. */
+.mt-stamp {
+  position: absolute;
+  right: -10%;
+  bottom: -12%;
+  width: 46%;
+  height: auto;
+  opacity: 0;
+  transform: scale(2.6) rotate(-24deg);
+  transition: opacity 0.25s ease,
+    transform 0.55s cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+.mt-scene[data-phase="1"] .mt-stamp,
+.mt-scene[data-phase="2"] .mt-stamp,
+.mt-scene[data-phase="3"] .mt-stamp {
+  opacity: 1;
+  transform: scale(1) rotate(-10deg);
+}
+.mt-impact {
+  position: absolute;
+  right: 2%;
+  bottom: 2%;
+  width: 90px;
+  height: 90px;
+  border: 4px solid #f73962;
+  border-radius: 50%;
+  opacity: 0;
+  transform: scale(0.3);
+}
+.mt-scene[data-phase="1"] .mt-impact {
+  animation: mt-impact 0.7s ease-out 0.15s forwards;
+}
+@keyframes mt-impact {
+  0% {
+    opacity: 0.9;
+    transform: scale(0.3);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.8);
+  }
+}
+
+/* Then the stamped passport shrinks into the newest block of the chain. */
+.mt-scene[data-phase="2"] .mt-passport,
+.mt-scene[data-phase="3"] .mt-passport {
+  transform: translate(52%, 88%) scale(0.2);
+  opacity: 0;
+}
+
+.mt-chain {
+  position: absolute;
+  left: 4%;
+  right: 4%;
+  bottom: 6%;
+  display: flex;
+  gap: 4%;
+}
+.mt-block {
+  flex: 1;
+  aspect-ratio: 1;
+  max-width: 90px;
+  background: #fffdf7;
+  border: 4px solid #120308;
+  border-radius: 12px;
+  position: relative;
+}
+/* Links between blocks. */
+.mt-block + .mt-block::before {
+  content: "";
+  position: absolute;
+  left: -30%;
+  top: 50%;
+  width: 30%;
+  height: 4px;
+  background: #120308;
+}
+.mt-block::after {
+  content: "";
+  position: absolute;
+  inset: 26% 20%;
+  background: repeating-linear-gradient(
+    #120308 0 4px,
+    transparent 4px 10px
+  );
+  opacity: 0.35;
+}
+.mt-block.is-new {
+  border-color: #f73962;
+  transition: background 0.5s ease, border-color 0.5s ease, transform 0.5s ease;
+}
+.mt-scene[data-phase="2"] .mt-block.is-new,
+.mt-scene[data-phase="3"] .mt-block.is-new {
+  background: #0f6b39;
+  border-color: #120308;
+  transform: translateY(-8px);
+}
+
+/* The real signature appears at the end. */
+.mt-sig {
+  position: absolute;
+  left: 4%;
+  right: 4%;
+  top: 10%;
+  padding: 18px;
+  background: #120308;
+  border-radius: 14px;
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.5s ease, transform 0.6s ease;
+}
+.mt-scene[data-phase="3"] .mt-sig {
+  opacity: 1;
+  transform: none;
+}
+.mt-sig-label {
+  font-size: 14px;
+  font-weight: 900;
+  color: #7fe0b0;
+}
+.mt-sig code {
+  display: block;
+  margin-top: 8px;
+  font-family: ui-monospace, monospace;
+  font-size: 13px;
+  font-weight: 700;
+  color: #fdf9eb;
+  word-break: break-all;
+}
+.mt-sig-link {
+  margin-top: 14px;
+  padding: 11px 16px;
+  font-size: 14px;
+  font-weight: 900;
+  color: #120308;
+  background: #fdf9eb;
+  border: none;
+  border-radius: 9px;
+  cursor: pointer;
+}
+
+/* ---------------------------------------------------------------------------
+   Step 6 — written or stop, then the label lands on the part.
+   --------------------------------------------------------------------------- */
+
+.al-scene {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4%;
+  height: 58vh;
+  min-height: 380px;
+}
+@media (min-width: 960px) {
+  .al-scene {
+    height: 68vh;
+    min-height: 460px;
+  }
+}
+
+.al-phone {
+  flex-shrink: 0;
+  width: 38%;
+  max-width: 220px;
+  aspect-ratio: 1 / 2;
+  padding: 3%;
+  background: #120308;
+  border-radius: 22px;
+  box-shadow: 0 16px 34px rgba(18, 3, 8, 0.28);
+}
+.al-screen {
+  height: 100%;
+  background: #fdf9eb;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  container-type: inline-size;
+  transition: background 0.4s;
+}
+.al-scene[data-phase="1"] .al-screen,
+.al-scene[data-phase="2"] .al-screen {
+  background: #e3f3ea;
+}
+.al-screen {
+  position: relative;
+}
+/* Both states are stacked in the same spot; phase decides which shows. */
+.al-state {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0 8cqw;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+.al-state-done {
+  opacity: 0;
+  transform: scale(0.94);
+}
+.al-scene[data-phase="1"] .al-state-writing,
+.al-scene[data-phase="2"] .al-state-writing {
+  opacity: 0;
+  transform: scale(0.94);
+}
+.al-scene[data-phase="1"] .al-state-done,
+.al-scene[data-phase="2"] .al-state-done {
+  opacity: 1;
+  transform: none;
+}
+/* The check only pops once its state is actually on screen. */
+.al-state-done .al-check {
+  animation: none;
+}
+.al-scene[data-phase="1"] .al-state-done .al-check {
+  animation: al-pop 0.45s cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+.al-state p {
+  margin-top: 5cqw;
+  font-size: 7cqw;
+  font-weight: 900;
+  color: #120308;
+}
+.al-spin {
+  display: block;
+  width: 20cqw;
+  height: 20cqw;
+  margin: 0 auto;
+  border-radius: 50%;
+  border: 2.6cqw solid rgba(18, 3, 8, 0.15);
+  border-top-color: #f73962;
+  animation: al-rot 0.8s linear infinite;
+}
+@keyframes al-rot {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.al-check {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28cqw;
+  height: 28cqw;
+  font-size: 8cqw;
+  font-weight: 900;
+  color: #fff;
+  background: #0f6b39;
+  border-radius: 50%;
+  animation: al-pop 0.45s cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+@keyframes al-pop {
+  from {
+    transform: scale(0.4);
+  }
+}
+.al-ok-title {
+  font-size: 8.5cqw !important;
+}
+.al-ok-note {
+  margin-top: 2cqw !important;
+  font-size: 6cqw !important;
+  color: #0f6b39 !important;
+}
+
+.al-partwrap {
+  position: relative;
+  width: 56%;
+  max-width: 320px;
+  aspect-ratio: 1;
+}
+.al-part {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 12px 0 rgba(18, 3, 8, 0.18));
+}
+.al-metal {
+  fill: #c7bea9;
+}
+.al-metal-dark {
+  fill: #120308;
+}
+.al-hub {
+  fill: #8a8170;
+}
+.al-vent {
+  stroke: #120308;
+  stroke-width: 6;
+  stroke-linecap: round;
+  opacity: 0.5;
+}
+
+/* The sticker hovers above the part, then drops and sticks. */
+.al-sticker {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 40%;
+  height: auto;
+  margin: -20% 0 0 -20%;
+  opacity: 0;
+  transform: translateY(-120%) rotate(-22deg) scale(1.2);
+  transition: opacity 0.35s ease,
+    transform 0.6s cubic-bezier(0.3, 1.5, 0.5, 1);
+}
+.al-scene[data-phase="1"] .al-sticker {
+  opacity: 1;
+  transform: translateY(-80%) rotate(-14deg) scale(1.1);
+}
+.al-scene[data-phase="2"] .al-sticker {
+  opacity: 1;
+  transform: translateY(0) rotate(-6deg) scale(1);
+}
+
+/* A short burst when it lands. */
+.al-burst {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+}
+.al-burst i {
+  position: absolute;
+  left: -3px;
+  top: -34px;
+  width: 6px;
+  height: 18px;
+  border-radius: 99px;
+  background: #f73962;
+  opacity: 0;
+  transform-origin: 3px 34px;
+}
+.al-burst i:nth-child(1) { transform: rotate(0deg); }
+.al-burst i:nth-child(2) { transform: rotate(60deg); }
+.al-burst i:nth-child(3) { transform: rotate(120deg); }
+.al-burst i:nth-child(4) { transform: rotate(180deg); }
+.al-burst i:nth-child(5) { transform: rotate(240deg); }
+.al-burst i:nth-child(6) { transform: rotate(300deg); }
+.al-scene[data-phase="2"] .al-burst i {
+  animation: al-burst 0.6s ease-out 0.35s forwards;
+}
+@keyframes al-burst {
+  0% {
+    opacity: 1;
+    translate: 0 0;
+  }
+  100% {
+    opacity: 0;
+    translate: 0 -60px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ct-row,
+  .ct-other,
+  .mt-passport,
+  .mt-stamp,
+  .mt-block.is-new,
+  .mt-sig,
+  .al-sticker,
+  .al-screen {
+    transition: none;
+  }
+  .mt-impact,
+  .al-spin,
+  .al-check,
+  .al-burst i {
+    animation: none;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Demo — factory stage.
+   One sticky viewport holds every factory scene stacked on top of each other.
+   The current one is visible; the rest are hidden with CSS but stay in the
+   page, so browser translation never has text pulled out from under it.
+   --------------------------------------------------------------------------- */
+
+.fs {
+  position: relative;
+}
+
+.fs-sticky {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 84px 20px 20px;
+}
+
+.fs-bar {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.fs-bar-label {
+  font-size: 14px;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  color: #120308;
+}
+.fs-bar-steps {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+.fs-seg {
+  position: relative;
+  flex: 1;
+  height: 6px;
+  border-radius: 99px;
+  background: rgba(18, 3, 8, 0.14);
+  overflow: hidden;
+}
+.fs-seg i {
+  position: absolute;
+  inset: 0;
+  background: #f73962;
+  transform-origin: left center;
+  transform: scaleX(0);
+}
+.fs-seg.is-done i {
+  transform: scaleX(1);
+}
+
+.fs-stage {
+  position: relative;
+  flex: 1;
+  margin-top: 14px;
+}
+
+.fs-layer {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(22px);
+  pointer-events: none;
+  transition: opacity 0.5s ease, transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1),
+    visibility 0s linear 0.6s;
+}
+.fs-layer.is-on {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  pointer-events: auto;
+  transition-delay: 0s;
+}
+
+/* ---------------------------------------------------------------------------
+   Text swap. Every variant is rendered and stacked in the same spot; only the
+   one matching data-show is visible. Replaces conditional text so translation
+   can never break the page.
+   --------------------------------------------------------------------------- */
+
+.swap {
+  display: inline-grid;
+}
+.swap > * {
+  grid-area: 1 / 1;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.swap[data-show="0"] > [data-v="0"],
+.swap[data-show="1"] > [data-v="1"],
+.swap[data-show="2"] > [data-v="2"] {
+  opacity: 1;
+}
+
+/* Step 6: both phone states stacked, phase decides which shows. */
+.al-screen {
+  position: relative;
+}
+.al-state {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0 8cqw;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+.al-state-done {
+  opacity: 0;
+  transform: scale(0.94);
+}
+.al-scene[data-phase="1"] .al-state-writing,
+.al-scene[data-phase="2"] .al-state-writing {
+  opacity: 0;
+  transform: scale(0.94);
+}
+.al-scene[data-phase="1"] .al-state-done,
+.al-scene[data-phase="2"] .al-state-done {
+  opacity: 1;
+  transform: none;
+}
+.al-state-done .al-check {
+  animation: none;
+}
+.al-scene[data-phase="1"] .al-state-done .al-check {
+  animation: al-pop 0.45s cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+
+/* ---------------------------------------------------------------------------
+   Phones: text and visual stack, so both are scaled down to fit one screen.
+   --------------------------------------------------------------------------- */
+
+@media (max-width: 959px) {
+  .fs-sticky {
+    padding: 76px 16px 14px;
+  }
+  .fs-layer .si-grid,
+  .fs-layer .rt-grid,
+  .fs-layer .sc-grid,
+  .fs-layer .dstep-grid {
+    gap: 14px;
+  }
+  .fs-layer .si-title,
+  .fs-layer .rt-title,
+  .fs-layer .sc-title,
+  .fs-layer .dstep-title {
+    font-size: 23px;
+    margin-top: 6px;
+  }
+  .fs-layer .si-body,
+  .fs-layer .rt-body,
+  .fs-layer .sc-body,
+  .fs-layer .dstep-body {
+    font-size: 14px;
+    line-height: 1.45;
+    margin-top: 8px;
+  }
+  .fs-layer .si-scene,
+  .fs-layer .rt-scene,
+  .fs-layer .sc-scene,
+  .fs-layer .mt-scene,
+  .fs-layer .al-scene {
+    height: 34vh;
+    min-height: 210px;
+  }
+  .fs-layer .ct-laptop {
+    max-width: 320px;
+  }
+  .fs-layer .ct-scene {
+    padding-bottom: 36px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fs-layer,
+  .swap > *,
+  .al-state {
+    transition: none;
+  }
+}
