@@ -13,6 +13,7 @@ const CREAM = "#fdf9eb";
 const LINKS = [
   { label: "About", href: "#about" },
   { label: "FAQ", href: "#faq" },
+  { label: "DEMO", href: "/demo" },
 ];
 
 export default function Navbar() {
