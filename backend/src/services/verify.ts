@@ -10,6 +10,7 @@
 import { query } from "../db/client";
 import { decryptKey } from "../crypto/keys";
 import { verifySun, deriveTagKeys } from "../crypto/sun";
+import { getAssemblyState, type AssemblyState } from "./assembly";
 
 export type VerificationResult = "authentic" | "unverified" | "alert";
 export type ChainStatus = "confirmed" | "unavailable" | "mismatch";
@@ -27,6 +28,11 @@ export interface VerificationResponse {
     assetId: string | null;
     mintSignature: string | null;
   } | null;
+  /**
+   * Present for sealed assemblies: what the manufacturer recorded as being
+   * inside, and whether the seal was applied across the opening.
+   */
+  assembly: AssemblyState | null;
   /** True when this is the first successful verification of this tag. */
   firstVerification: boolean;
   verificationCount: number;
@@ -55,6 +61,7 @@ const UNVERIFIED: VerificationResponse = {
   result: "unverified",
   chainStatus: null,
   part: null,
+  assembly: null,
   firstVerification: false,
   verificationCount: 0,
 };
@@ -151,6 +158,7 @@ export async function verifyTap(
       result: "alert",
       chainStatus: null,
       part: null,
+      assembly: null,
       firstVerification: false,
       verificationCount: 0,
       alertReason:
@@ -194,9 +202,20 @@ export async function verifyTap(
     input.geo
   );
 
+  // Loaded only once the tap has validated, so an invalid tap never reveals
+  // what a real assembly should contain.
+  let assembly: AssemblyState | null = null;
+  try {
+    const state = await getAssemblyState(matched.id);
+    assembly = state.isAssembly ? state : null;
+  } catch {
+    assembly = null;
+  }
+
   return {
     result,
     chainStatus,
+    assembly,
     part: {
       model: matched.model,
       description: matched.description,

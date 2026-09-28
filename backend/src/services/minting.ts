@@ -22,6 +22,15 @@ export interface PassportMetadata {
   batch: string;
   manufacturerName: string;
   chipUid: string;
+  /**
+   * For a component inside a sealed assembly, the asset id of the assembly it
+   * belongs to. Written into the passport itself so the relationship survives
+   * without our database: anyone can read a component's passport and see which
+   * assembly claims it, and read the assembly's and see what should be inside.
+   */
+  parentAssetId?: string;
+  /** What the component is within the assembly, e.g. "voltage regulator". */
+  componentRole?: string;
 }
 
 let cachedUmi: ReturnType<typeof createUmi> | null = null;
@@ -110,7 +119,12 @@ export async function mintPassport(
     leafOwner: umi.identity.publicKey,
     merkleTree,
     metadata: {
-      name: metadata.model.slice(0, 32),
+      // The name carries the role so a wallet or explorer showing only the
+      // name still makes the relationship visible.
+      name: (metadata.componentRole
+        ? metadata.componentRole + " / " + metadata.model
+        : metadata.model
+      ).slice(0, 32),
       uri: `${process.env.VERIFY_BASE_URL ?? "https://veymark.xyz"}/api/metadata/${metadata.chipUid}`,
       sellerFeeBasisPoints: 0,
       collection: none(),
