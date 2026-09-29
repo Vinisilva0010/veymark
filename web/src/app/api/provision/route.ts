@@ -1,6 +1,10 @@
 import { NextRequest } from "next/server";
 import { requireUser } from "@/lib/session";
-import { provisionPart, listPendingMints } from "@backend/services/provisioning";
+import {
+  provisionPart,
+  listPendingMints,
+  type SealPosition,
+} from "@backend/services/provisioning";
 
 export async function GET() {
   const auth = await requireUser();
@@ -18,6 +22,7 @@ export async function POST(request: NextRequest) {
     productId?: unknown;
     chipUid?: unknown;
     batch?: unknown;
+    sealPosition?: unknown;
   };
 
   try {
@@ -45,6 +50,10 @@ export async function POST(request: NextRequest) {
       batch: body.batch,
       operatorUserId: auth.user.userId,
       operatorLabel: auth.user.email,
+      // Passed through as received. provisionPart refuses an unrecognised
+      // value with a 400 rather than coercing it, so a frontend bug cannot
+      // record "surface" on a part the operator sealed across the opening.
+      sealPosition: body.sealPosition as SealPosition | undefined,
     });
 
     // The tag master key is returned exactly once, here. The database only

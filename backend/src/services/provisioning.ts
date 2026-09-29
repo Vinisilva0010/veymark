@@ -18,6 +18,8 @@ import { query } from "../db/client";
 import { encryptKey } from "../crypto/keys";
 import { mintPassport } from "./minting";
 
+export type SealPosition = "surface" | "across_opening";
+
 export interface ProvisionInput {
   productId: string;
   manufacturerId: string;
@@ -25,6 +27,13 @@ export interface ProvisionInput {
   batch: string;
   operatorUserId: string;
   operatorLabel: string;
+  /**
+   * Where the tag goes on the part. On a sealed case it must go across the
+   * opening, so opening the case tears the antenna and the part stops
+   * answering. Recorded here because verification reports it to the buyer:
+   * a silent tag only means "this was opened" if the tag was a seal.
+   */
+  sealPosition?: SealPosition;
 }
 
 export interface ProvisionResult {
@@ -39,6 +48,8 @@ export interface ProvisionResult {
 
 const UID_PATTERN = /^[0-9A-F]{14}$/;
 
+const SEAL_POSITIONS: readonly SealPosition[] = ["surface", "across_opening"];
+
 export async function provisionPart(
   input: ProvisionInput
 ): Promise<ProvisionResult> {
@@ -50,6 +61,21 @@ export async function provisionPart(
 
   const batch = input.batch.trim();
   if (!batch) throw new Error("Batch is required");
+
+  // An unrecognised seal position is refused instead of being coerced. A
+  // silent fallback would let the operator apply the tag across the opening
+  // while the record says "surface", and verification would then tell the
+  // buyer the tag was never a seal. The bug must surface at provisioning
+  // time, not on the buyer's phone. Absence stays valid: a part with no
+  // stated position is a surface tag.
+  if (
+    input.sealPosition !== undefined &&
+    !SEAL_POSITIONS.includes(input.sealPosition)
+  ) {
+    throw new Error(
+      `Seal position must be one of: ${SEAL_POSITIONS.join(", ")}`
+    );
+  }
 
   // Confirm the product belongs to this manufacturer before writing anything.
   // Without this check an operator could provision parts against another
@@ -74,8 +100,8 @@ export async function provisionPart(
     const rows = await query<{ id: string }>(
       `INSERT INTO parts
          (product_id, chip_uid, sdm_key_encrypted, batch,
-          provisioned_by, provisioned_by_user_id, mint_status)
-       VALUES ($1, $2, $3, $4, $5, $6, 'pending')
+          provisioned_by, provisioned_by_user_id, mint_status, seal_position)
+       VALUES ($1, $2, $3, $4, $5, $6, 'pending', $7)
        RETURNING id`,
       [
         input.productId,
@@ -84,6 +110,7 @@ export async function provisionPart(
         batch,
         input.operatorLabel,
         input.operatorUserId,
+        input.sealPosition ?? "surface",
       ]
     );
     partId = rows[0].id;
