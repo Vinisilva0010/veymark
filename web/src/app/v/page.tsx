@@ -18,6 +18,17 @@ type VerificationResponse = {
     assetId: string | null;
     mintSignature: string | null;
   } | null;
+  assembly: {
+    isAssembly: boolean;
+    sealPosition: "surface" | "across_opening";
+    complete: boolean;
+    slots: {
+      role: string;
+      filled: boolean;
+      model: string | null;
+      chipUid: string | null;
+    }[];
+  } | null;
   firstVerification: boolean;
   verificationCount: number;
   alertReason?: string;
@@ -180,6 +191,43 @@ function VerifyContent() {
           <dd>{formatDate(part.provisionedAt)}</dd>
         </div>
       </dl>
+
+      {/* For a sealed case, what the maker recorded as being inside it. A tag
+          on the case alone says nothing about its contents, so this is where
+          a swapped internal shows up. */}
+      {data.assembly?.isAssembly && (
+        <div className="vm-v-inside">
+          <p className="vm-v-inside-title">What should be inside</p>
+
+          <ul className="vm-v-slots">
+            {data.assembly.slots.map((slot) => (
+              <li
+                key={slot.role}
+                className={slot.filled ? "is-filled" : "is-missing"}
+              >
+                <span className="vm-v-slot-role">{slot.role}</span>
+                <span className="vm-v-slot-value">
+                  {slot.filled ? slot.model : "Not recorded"}
+                </span>
+              </li>
+            ))}
+          </ul>
+
+          {data.assembly.sealPosition === "across_opening" && (
+            <p className="vm-v-seal">
+              The tag is sealed across the opening. Opening this case breaks it,
+              and the part stops answering.
+            </p>
+          )}
+
+          {!data.assembly.complete && (
+            <p className="vm-v-incomplete">
+              Something the maker declared is not recorded here. Ask them before
+              fitting this part.
+            </p>
+          )}
+        </div>
+      )}
 
       {/* The chain status is shown, never hidden. If the public record cannot
           be read, the screen says so — hiding it would undermine the one proof

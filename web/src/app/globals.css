@@ -3340,3 +3340,77 @@ body.demo-page > header {
     transition: none;
   }
 }
+
+/* ---------------------------------------------------------------------------
+   Verification page — contents of a sealed assembly.
+   A tag on the case says nothing about what is inside it, so this block is
+   where a swapped internal becomes visible to the buyer.
+   --------------------------------------------------------------------------- */
+
+.vm-v-inside {
+  margin-top: 18px;
+  padding: 15px 14px;
+  text-align: left;
+  background: rgba(18, 3, 8, 0.04);
+  border-radius: 12px;
+}
+
+.vm-v-inside-title {
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: #46141d;
+}
+
+.vm-v-slots {
+  margin-top: 8px;
+  list-style: none;
+  padding: 0;
+}
+.vm-v-slots li {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 0;
+  border-top: 1px solid rgba(18, 3, 8, 0.12);
+}
+.vm-v-slot-role {
+  font-size: 13px;
+  font-weight: 800;
+  color: #46141d;
+  text-transform: capitalize;
+}
+.vm-v-slot-value {
+  font-size: 14px;
+  font-weight: 800;
+  text-align: right;
+  color: #120308;
+}
+/* A declared slot with nothing in it is a finding, not a blank. */
+.vm-v-slots li.is-missing .vm-v-slot-value {
+  color: #9a6c05;
+}
+
+.vm-v-seal {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: 9px;
+  background: rgba(15, 107, 57, 0.1);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.45;
+  color: #0f6b39;
+}
+
+.vm-v-incomplete {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 9px;
+  background: rgba(154, 108, 5, 0.12);
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.45;
+  color: #7a5504;
+}
