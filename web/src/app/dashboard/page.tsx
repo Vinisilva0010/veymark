@@ -12,6 +12,7 @@ type Product = {
   description: string | null;
   category: string | null;
   part_count: number;
+  is_assembly: boolean;
 };
 
 type Account = {
@@ -30,6 +31,13 @@ type Session = {
   expires_at: string;
   user_agent: string | null;
   ip_address: string | null;
+};
+
+type Slot = {
+  id: string;
+  role: string;
+  component_product_id: string | null;
+  component_model: string | null;
 };
 
 type Tab = "catalog" | "sessions";
@@ -72,6 +80,13 @@ export default function DashboardPage() {
   const [editModel, setEditModel] = useState("");
   const [editDescription, setEditDescription] = useState("");
   const [editCategory, setEditCategory] = useState("");
+
+  // Declared contents of the product being edited. Loaded per product rather
+  // than with the list: most products are not assemblies, and fetching every
+  // product's contents to show none of them is work for nothing.
+  const [slots, setSlots] = useState<Slot[]>([]);
+  const [slotRole, setSlotRole] = useState("");
+  const [slotProductId, setSlotProductId] = useState("");
 
   // Delete asks for confirmation inline: the button becomes "Confirm" for a
   // few seconds instead of opening a modal, which is awkward on a phone.
@@ -134,6 +149,64 @@ export default function DashboardPage() {
     setEditDescription(product.description ?? "");
     setEditCategory(product.category ?? "");
     setError(null);
+    setSlots([]);
+    setSlotRole("");
+    setSlotProductId("");
+    loadSlots(product.id);
+  }
+
+  async function loadSlots(productId: string) {
+    const response = await fetch(`/api/products/${productId}/components`);
+    if (!response.ok) return;
+    const data = await response.json().catch(() => ({}));
+    setSlots(data.components ?? []);
+  }
+
+  async function handleAddSlot(productId: string) {
+    setError(null);
+    setBusy(true);
+    try {
+      const response = await fetch(`/api/products/${productId}/components`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          role: slotRole,
+          componentProductId: slotProductId || null,
+        }),
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        setError(data.error ?? "Could not declare that component");
+        return;
+      }
+      setSlotRole("");
+      setSlotProductId("");
+      await loadSlots(productId);
+      // The first slot turns the product into an assembly, so the list is
+      // refreshed to show it.
+      await load();
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function handleRemoveSlot(productId: string, slotId: string) {
+    setError(null);
+    setBusy(true);
+    try {
+      const response = await fetch(
+        `/api/products/${productId}/components?slotId=${slotId}`,
+        { method: "DELETE" }
+      );
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        setError(data.error ?? "Could not remove that component");
+        return;
+      }
+      await loadSlots(productId);
+    } finally {
+      setBusy(false);
+    }
   }
 
   async function handleUpdate(event: React.FormEvent) {
@@ -349,6 +422,84 @@ export default function DashboardPage() {
                           className="vm-input"
                         />
                       </label>
+                      {/* Contents of a sealed case. A tag on the case proves
+                          the case, not what is inside it, so the parts that
+                          belong in it are named here — once, in the office —
+                          and the assembly station refuses anything else. */}
+                      <div className="vm-slots">
+                        <span className="vm-label">Contents</span>
+                        <p className="vm-hint">
+                          Name each part that belongs inside this one. Leave
+                          empty if this product is not a sealed case.
+                        </p>
+
+                        {slots.length > 0 && (
+                          <ul className="vm-list">
+                            {slots.map((slot) => (
+                              <li key={slot.id} className="vm-card vm-item">
+                                <div className="vm-item-main">
+                                  <h3 className="vm-item-model">{slot.role}</h3>
+                                  <p className="vm-item-desc">
+                                    {slot.component_model ??
+                                      "No product declared yet"}
+                                  </p>
+                                </div>
+                                <div className="vm-row vm-actions">
+                                  <button
+                                    type="button"
+                                    disabled={busy}
+                                    onClick={() =>
+                                      handleRemoveSlot(product.id, slot.id)
+                                    }
+                                    className="vm-ghost vm-ghost-danger"
+                                  >
+                                    Remove
+                                  </button>
+                                </div>
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+
+                        <label className="vm-field">
+                          <span className="vm-label">Goes in as</span>
+                          <input
+                            value={slotRole}
+                            onChange={(e) => setSlotRole(e.target.value)}
+                            maxLength={60}
+                            placeholder="cell"
+                            className="vm-input"
+                          />
+                        </label>
+
+                        <label className="vm-field">
+                          <span className="vm-label">Which product</span>
+                          <select
+                            value={slotProductId}
+                            onChange={(e) => setSlotProductId(e.target.value)}
+                            className="vm-input"
+                          >
+                            <option value="">Select a product</option>
+                            {products
+                              .filter((candidate) => candidate.id !== product.id)
+                              .map((candidate) => (
+                                <option key={candidate.id} value={candidate.id}>
+                                  {candidate.model}
+                                </option>
+                              ))}
+                          </select>
+                        </label>
+
+                        <button
+                          type="button"
+                          disabled={busy || !slotRole.trim() || !slotProductId}
+                          onClick={() => handleAddSlot(product.id)}
+                          className="vm-submit"
+                        >
+                          Add to contents
+                        </button>
+                      </div>
+
                       <div className="vm-row">
                         <button
                           type="submit"
@@ -381,6 +532,9 @@ export default function DashboardPage() {
                             {product.part_count}{" "}
                             {product.part_count === 1 ? "part" : "parts"}
                           </span>
+                          {product.is_assembly && (
+                            <span className="vm-chip">Sealed case</span>
+                          )}
                         </div>
                       </div>
                       <div className="vm-row vm-actions">
