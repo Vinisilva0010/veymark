@@ -2,6 +2,8 @@
 
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
+import DashNav from "@/components/DashNav";
+import { soundAccepted, soundRefused } from "@/lib/feedback";
 
 const CORAL = "#f73962";
 const WINE = "#500414";
@@ -80,6 +82,7 @@ export default function ProvisionPage() {
       const data = await response.json().catch(() => ({}));
 
       if (!response.ok) {
+        soundRefused();
         setOutcome({
           kind: "failed",
           chipUid,
@@ -88,6 +91,7 @@ export default function ProvisionPage() {
         return;
       }
 
+      soundAccepted();
       setOutcome({
         kind: "written",
         chipUid: data.result.chipUid,
@@ -99,6 +103,7 @@ export default function ProvisionPage() {
       setChipUid("");
       await load();
     } catch {
+      soundRefused();
       setOutcome({
         kind: "failed",
         chipUid,
@@ -140,14 +145,9 @@ export default function ProvisionPage() {
           <h1 className="vm-dash-title">Write tags</h1>
           <p className="vm-dash-sub">{count} written this session</p>
         </div>
-        <button
-          type="button"
-          onClick={() => router.push("/dashboard")}
-          className="vm-ghost"
-        >
-          Back
-        </button>
       </header>
+
+      <DashNav />
 
       {!shiftLocked ? (
         <section className="vm-section">

@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
+import DashNav from "@/components/DashNav";
 
 const CORAL = "#f73962";
 const WINE = "#500414";
@@ -297,18 +298,13 @@ export default function DashboardPage() {
           </p>
         </div>
         <div className="vm-row vm-actions">
-          <button
-            type="button"
-            onClick={() => router.push("/dashboard/provision")}
-            className="vm-primary"
-          >
-            Provision
-          </button>
           <button type="button" onClick={handleLogout} className="vm-ghost">
             Sign out
           </button>
         </div>
       </header>
+
+      <DashNav />
 
       <nav className="vm-tabs">
         <button

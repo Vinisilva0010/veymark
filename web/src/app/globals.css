@@ -3414,3 +3414,49 @@ body.demo-page > header {
   line-height: 1.45;
   color: #7a5504;
 }
+
+/* Panel navigation.
+   Targets are 52px tall with real gaps between them: an operator taps this
+   with a glove on, where a target sized for a bare fingertip misses. */
+.vm-nav {
+  display: flex;
+  gap: 10px;
+  margin-top: 18px;
+  flex-wrap: wrap;
+}
+.vm-nav-item {
+  min-height: 52px;
+  padding: 0 20px;
+  font-size: 16px;
+  font-weight: 800;
+  color: #500414;
+  background: rgba(255, 255, 255, 0.7);
+  border: 2px solid rgba(80, 4, 20, 0.25);
+  border-radius: 12px;
+  cursor: pointer;
+}
+.vm-nav-item.is-active {
+  color: #ffffff;
+  background: #f73962;
+  border-color: #f73962;
+}
+
+/* The inactive tab was set at 55% opacity, which is unreadable on this
+   background. Full colour, heavier weight. */
+.vm-tab {
+  color: #500414;
+}
+
+/* Contents block inside product editing. */
+.vm-slots {
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(80, 4, 20, 0.12);
+}
+
+/* The panel owns its own surface. Painting the content box left the page
+   margins on the browser default, so the colour had to go on the body. The
+   class is set from the panel layout, which only wraps /dashboard. */
+body.vm-dash-page {
+  background: #fdf9eb;
+}

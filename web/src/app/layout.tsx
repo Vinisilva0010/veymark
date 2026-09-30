@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import Background from "@/components/Background";
-import Navbar from "@/components/Navbar";
+import SiteChrome from "@/components/SiteChrome";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -17,8 +16,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="relative min-h-screen antialiased">
-                <Background />
-                 <Navbar />
+        <SiteChrome />
         {children}
       </body>
     </html>
