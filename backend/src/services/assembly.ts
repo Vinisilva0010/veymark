@@ -160,16 +160,49 @@ export async function attachComponent(
     throw new Error("That component is already inside another assembly");
   }
 
-  const declared = await query<{ role: string }>(
-    `SELECT pc.role
+  const declared = await query<{
+    component_product_id: string | null;
+    expected_model: string | null;
+  }>(
+    `SELECT pc.component_product_id, cp.model AS expected_model
        FROM product_components pc
        JOIN parts p ON p.product_id = pc.product_id
+       LEFT JOIN products cp ON cp.id = pc.component_product_id
       WHERE p.id = $1 AND pc.role = $2`,
     [assemblyPartId, role]
   );
 
   if (declared.length === 0) {
     throw new Error("That role is not declared for this assembly");
+  }
+
+  const slot = declared[0];
+
+  // A slot with no product named accepts nothing. Allowing anything here
+  // would make the role label decorative: the contents would say "cell"
+  // while holding whatever tag was read next.
+  if (!slot.component_product_id) {
+    throw new Error(
+      "No product is declared for that role yet. Declare it before attaching."
+    );
+  }
+
+  // The component must be the product this slot expects. Without this the
+  // recorded contents are only as good as the operator's aim, and a buyer
+  // reading "cell: present" would learn nothing about what is actually
+  // inside the case.
+  const [componentProduct] = await query<{ product_id: string; model: string }>(
+    `SELECT p.product_id, pr.model
+       FROM parts p
+       JOIN products pr ON pr.id = p.product_id
+      WHERE p.id = $1`,
+    [componentPartId]
+  );
+
+  if (componentProduct.product_id !== slot.component_product_id) {
+    throw new Error(
+      `That role takes ${slot.expected_model}, not ${componentProduct.model}`
+    );
   }
 
   const taken = await query(

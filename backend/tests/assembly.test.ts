@@ -70,9 +70,9 @@ async function main() {
   );
 
   await query(
-    `INSERT INTO product_components (product_id, role)
-     VALUES ($1, 'cell stack'), ($1, 'management board')`,
-    [battery.id]
+    `INSERT INTO product_components (product_id, role, component_product_id)
+     VALUES ($1, 'cell stack', $2), ($1, 'management board', $3)`,
+    [battery.id, cell.id, bms.id]
   );
 
   const assemblyPart = await provision(battery.id, "ASM-1");
@@ -127,6 +127,35 @@ async function main() {
   // A plain part reports as not an assembly.
   const plainState = await getAssemblyState(cellPart);
   check("a component is not itself an assembly", !plainState.isAssembly);
+
+  // A slot names the product that fills it. Without this check the role label
+  // is decorative: a board recorded as the cell stack would read as present,
+  // and a buyer checking the contents would learn nothing true about them.
+  const strayBattery = await provision(battery.id, "ASM-1");
+  const strayCell = await provision(cell.id, "ASM-1");
+
+  await expectRejection("a component of the wrong product is refused", () =>
+    attachComponent(strayBattery, strayCell, "management board", manufacturer.id)
+  );
+
+  // The refusal must leave the component free. A component marked as used by
+  // a refused attach could never be fitted anywhere.
+  const afterRefusal = await getAssemblyState(strayBattery);
+  check(
+    "a refused attach fills no slot",
+    afterRefusal.slots.every((s) => !s.filled)
+  );
+
+  // A slot with no product declared accepts nothing: there is no way to know
+  // what belongs there, and guessing would defeat the point of declaring it.
+  await query(
+    `INSERT INTO product_components (product_id, role) VALUES ($1, 'spare')`,
+    [battery.id]
+  );
+
+  await expectRejection("a slot with no product declared is refused", () =>
+    attachComponent(strayBattery, strayCell, "spare", manufacturer.id)
+  );
 
   // Clean up so repeated runs do not pile up test rows.
   await query(`DELETE FROM parts WHERE provisioned_by = 'assembly-test'`);
