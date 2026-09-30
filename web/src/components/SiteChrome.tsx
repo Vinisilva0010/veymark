@@ -18,7 +18,12 @@ import Navbar from "@/components/Navbar";
 export default function SiteChrome() {
   const pathname = usePathname();
 
+  // The panel is the factory's operating system and /v is what a buyer sees
+  // on tapping a part. Neither is a page of the website: the marketing bar
+  // over a verification result competes with the one thing that screen
+  // exists to say. Both screens carry their own way back to the site.
   if (pathname?.startsWith("/dashboard")) return null;
+  if (pathname?.startsWith("/v")) return null;
 
   return (
     <>

@@ -3460,3 +3460,10 @@ body.demo-page > header {
 body.vm-dash-page {
   background: #fdf9eb;
 }
+
+/* Link from a written tag to the buyer's view of it. */
+.vm-verify-link {
+  color: #500414;
+  font-weight: 800;
+  text-decoration: underline;
+}

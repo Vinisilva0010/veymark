@@ -45,6 +45,11 @@ export default function ProvisionPage() {
   const [outcome, setOutcome] = useState<Outcome | null>(null);
   const [busy, setBusy] = useState(false);
   const [count, setCount] = useState(0);
+
+  // Where a buyer's phone would land for the tag just written. Present only
+  // while simulated taps are enabled; in a real installation this is the one
+  // thing the factory must not be able to produce without the chip.
+  const [verifyUrl, setVerifyUrl] = useState<string | null>(null);
   const uidInput = useRef<HTMLInputElement | null>(null);
 
   const load = useCallback(async () => {
@@ -71,6 +76,7 @@ export default function ProvisionPage() {
     event.preventDefault();
     setBusy(true);
     setOutcome(null);
+    setVerifyUrl(null);
 
     try {
       const response = await fetch("/api/provision", {
@@ -92,6 +98,10 @@ export default function ProvisionPage() {
       }
 
       soundAccepted();
+      fetch(`/api/simulate-tap?chipUid=${data.result.chipUid}`)
+        .then((r) => (r.ok ? r.json() : null))
+        .then((tap) => setVerifyUrl(tap?.url ?? null))
+        .catch(() => setVerifyUrl(null));
       setOutcome({
         kind: "written",
         chipUid: data.result.chipUid,
@@ -274,6 +284,19 @@ export default function ProvisionPage() {
                   </dd>
                 </div>
               </dl>
+
+              {verifyUrl && (
+                <p className="vm-result-body">
+                  <a
+                    href={verifyUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="vm-verify-link"
+                  >
+                    See what a buyer sees when they tap this part
+                  </a>
+                </p>
+              )}
             </div>
           )}
 
