@@ -248,9 +248,6 @@ export async function declareComponentSlot(
   );
 
   if (!assembly) throw new Error("Product not found");
-  if (!assembly.is_assembly) {
-    throw new Error("This product is not a sealed assembly");
-  }
 
   if (componentProductId) {
     if (componentProductId === productId) {
@@ -274,6 +271,15 @@ export async function declareComponentSlot(
                  (SELECT model FROM products WHERE id = $3) AS component_model`,
       [productId, trimmedRole, componentProductId]
     );
+    // A product with declared contents is an assembly by definition. Setting
+    // it here rather than asking for it separately removes the state where a
+    // product lists its contents but is not treated as a case.
+    if (!assembly.is_assembly) {
+      await query(`UPDATE products SET is_assembly = TRUE WHERE id = $1`, [
+        productId,
+      ]);
+    }
+
     return rows[0];
   } catch (err) {
     if (typeof err === "object" && err !== null && "code" in err) {

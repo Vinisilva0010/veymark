@@ -54,14 +54,9 @@ async function main() {
   const caseProduct = await newProduct(manufacturer.id, "Case");
   const partProduct = await newProduct(manufacturer.id, "Insert");
 
-  // A plain product holds nothing: declaring a slot on it would produce a
-  // contents list nobody ever fills.
-  await expectRejection("a plain product cannot declare slots", () =>
-    declareComponentSlot(caseProduct, manufacturer.id, "insert", partProduct)
-  );
-
-  await setAssembly(caseProduct, manufacturer.id, true);
-
+  // Declaring contents is what makes a product a case. Asking for the flag
+  // separately would allow a product that lists its contents but is not
+  // treated as an assembly.
   const slot = await declareComponentSlot(
     caseProduct,
     manufacturer.id,
@@ -69,6 +64,12 @@ async function main() {
     partProduct
   );
   check("slot declared with its product", slot.component_product_id === partProduct);
+
+  const [flagged] = await query<{ is_assembly: boolean }>(
+    `SELECT is_assembly FROM products WHERE id = $1`,
+    [caseProduct]
+  );
+  check("declaring a slot makes it an assembly", flagged.is_assembly);
 
   const slots = await listComponentSlots(caseProduct, manufacturer.id);
   check("slot is listed", slots.length === 1);
