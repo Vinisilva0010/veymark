@@ -384,7 +384,9 @@ export default function DashboardPage() {
 
           {products.length === 0 ? (
             <p className="vm-empty">
-              No products yet. Add one before provisioning tags.
+              Nothing in the catalogue yet. Start here: add the part your
+              factory makes, then go to Write tags to register the first
+              physical unit of it.
             </p>
           ) : (
             <ul className="vm-list">

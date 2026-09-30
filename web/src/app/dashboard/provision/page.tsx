@@ -151,11 +151,18 @@ export default function ProvisionPage() {
 
       {!shiftLocked ? (
         <section className="vm-section">
-          <h2 className="vm-h2">Start a run</h2>
+          <h2 className="vm-h2">Step 1 — set up the run</h2>
           <p className="vm-hint">
-            Pick the product and batch once. Every tag written after this
-            inherits them.
+            Pick the product and batch once, before you start. Every tag you
+            write after this belongs to them, so you do not retype it per part.
           </p>
+
+          {products.length === 0 && (
+            <p className="vm-empty">
+              No products to write tags for. Add one under Products first — a
+              tag always belongs to a product.
+            </p>
+          )}
 
           <div className="vm-card vm-form">
             <label className="vm-field">
@@ -218,7 +225,13 @@ export default function ProvisionPage() {
 
           <form onSubmit={handleWrite} className="vm-card vm-form">
             <label className="vm-field">
-              <span className="vm-label">Chip UID</span>
+              <span className="vm-label">
+                Step 2 — hold the tag against the reader
+              </span>
+              <p className="vm-hint">
+                The number fills in by itself. Type it only if you have no
+                reader.
+              </p>
               <input
                 ref={uidInput}
                 value={chipUid}
@@ -244,7 +257,8 @@ export default function ProvisionPage() {
               <span className="vm-result-icon">OK</span>
               <h3 className="vm-result-title">Tag registered</h3>
               <p className="vm-result-body">
-                Apply the label to the part now.
+                Apply the label to the part now. If this part goes inside a
+                sealed case, apply it across the opening.
               </p>
               <dl className="vm-result-data">
                 <div>
