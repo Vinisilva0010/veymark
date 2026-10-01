@@ -2068,7 +2068,8 @@
   transition: background 0.4s;
 }
 .al-scene[data-phase="1"] .al-screen,
-.al-scene[data-phase="2"] .al-screen {
+.al-scene[data-phase="2"] .al-screen,
+.al-scene[data-phase="3"] .al-screen {
   background: #e3f3ea;
 }
 .al-screen {
@@ -2091,12 +2092,14 @@
   transform: scale(0.94);
 }
 .al-scene[data-phase="1"] .al-state-writing,
-.al-scene[data-phase="2"] .al-state-writing {
+.al-scene[data-phase="2"] .al-state-writing,
+.al-scene[data-phase="3"] .al-state-writing {
   opacity: 0;
   transform: scale(0.94);
 }
 .al-scene[data-phase="1"] .al-state-done,
-.al-scene[data-phase="2"] .al-state-done {
+.al-scene[data-phase="2"] .al-state-done,
+.al-scene[data-phase="3"] .al-state-done {
   opacity: 1;
   transform: none;
 }
@@ -2383,12 +2386,14 @@
   transform: scale(0.94);
 }
 .al-scene[data-phase="1"] .al-state-writing,
-.al-scene[data-phase="2"] .al-state-writing {
+.al-scene[data-phase="2"] .al-state-writing,
+.al-scene[data-phase="3"] .al-state-writing {
   opacity: 0;
   transform: scale(0.94);
 }
 .al-scene[data-phase="1"] .al-state-done,
-.al-scene[data-phase="2"] .al-state-done {
+.al-scene[data-phase="2"] .al-state-done,
+.al-scene[data-phase="3"] .al-state-done {
   opacity: 1;
   transform: none;
 }
@@ -3467,3 +3472,86 @@ body.vm-dash-page {
   font-weight: 800;
   text-decoration: underline;
 }
+
+/* Step 6 — sealed case: label across the opening, then torn, then contents.
+   Phase 0 is the screen result alone; the case fades in from phase 1. All
+   prefixed sl- so none of the existing al- rules are touched. */
+.sl-stage {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+}
+.sl-svg {
+  width: 100%;
+  max-width: 420px;
+  opacity: 0;
+  transition: opacity 0.45s ease;
+}
+.sl-scene[data-phase="1"] .sl-svg,
+.sl-scene[data-phase="2"] .sl-svg,
+.sl-scene[data-phase="3"] .sl-svg {
+  opacity: 1;
+}
+
+.sl-body { fill: #e6dcc4; stroke: #500414; stroke-width: 2.5; }
+.sl-body-lip { fill: rgba(80, 4, 20, 0.14); }
+.sl-term { fill: #500414; }
+.sl-cell { fill: #fdf9eb; stroke: #500414; stroke-width: 2; }
+.sl-tag-mini { fill: #f73962; }
+
+.sl-case-label,
+.sl-part-label {
+  fill: #500414;
+  font-weight: 800;
+  text-anchor: middle;
+  font-family: inherit;
+}
+.sl-case-label { font-size: 11px; letter-spacing: 0.1em; }
+.sl-part-label { font-size: 10px; letter-spacing: 0.08em; }
+
+/* The lid hinges up from the left edge of the seam. */
+.sl-lid {
+  transform-origin: 30px 100px;
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.sl-scene[data-phase="2"] .sl-lid,
+.sl-scene[data-phase="3"] .sl-lid {
+  transform: rotate(-28deg) translateY(-6px);
+}
+
+/* Contents are hidden behind the closed lid. */
+.sl-contents {
+  opacity: 0;
+  transition: opacity 0.5s ease 0.25s;
+}
+.sl-scene[data-phase="3"] .sl-contents { opacity: 1; }
+
+/* The label is the Veymark mark, cut in two across the seam. The top half
+   travels with the lid, so opening the case pulls the mark apart. */
+.sl-mark-top {
+  transform-origin: 30px 100px;
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.sl-scene[data-phase="2"] .sl-mark-top,
+.sl-scene[data-phase="3"] .sl-mark-top {
+  transform: rotate(-28deg) translateY(-6px);
+}
+
+.sl-caption {
+  position: absolute;
+  bottom: 2%;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 15px;
+  font-weight: 800;
+  color: #500414;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+.sl-scene[data-phase="1"] .sl-caption-sealed { opacity: 1; }
+.sl-scene[data-phase="2"] .sl-caption-torn { opacity: 1; }
+.sl-scene[data-phase="3"] .sl-caption-inside { opacity: 1; }
