@@ -4,6 +4,7 @@ import VerifyStates from "@/components/VerifyStates";
 import About from "@/components/About";
 import Footer from "@/components/Footer";
 import Faq from "@/components/Faq";
+import Waitlist from "@/components/Waitlist";
 export default function Home() {
   return (
     <main className="relative">
@@ -17,6 +18,8 @@ export default function Home() {
               part and its passport on Solana. The secret never appears on any
               screen, so there is nothing to photograph.
             </p>
+
+            <Waitlist />
           </div>
 
           <div className="order-first md:order-last">

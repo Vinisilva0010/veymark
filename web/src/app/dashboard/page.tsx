@@ -41,7 +41,18 @@ type Slot = {
   component_model: string | null;
 };
 
-type Tab = "catalog" | "sessions";
+type Interest = {
+  id: string;
+  kind: "waitlist" | "manufacturer";
+  company: string | null;
+  contact_name: string | null;
+  email: string;
+  parts_made: string | null;
+  problem: string | null;
+  created_at: string;
+};
+
+type Tab = "catalog" | "sessions" | "interest";
 
 function formatWhen(iso: string): string {
   return new Date(iso).toLocaleString(undefined, {
@@ -68,6 +79,7 @@ export default function DashboardPage() {
   const [account, setAccount] = useState<Account | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [sessions, setSessions] = useState<Session[]>([]);
+  const [interest, setInterest] = useState<Interest[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -95,10 +107,11 @@ export default function DashboardPage() {
   const confirmTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const load = useCallback(async () => {
-    const [meRes, productsRes, sessionsRes] = await Promise.all([
+    const [meRes, productsRes, sessionsRes, interestRes] = await Promise.all([
       fetch("/api/auth/me"),
       fetch("/api/products"),
       fetch("/api/sessions"),
+      fetch("/api/interest"),
     ]);
 
     if (meRes.status === 401) {
@@ -109,6 +122,7 @@ export default function DashboardPage() {
     setAccount(await meRes.json());
     setProducts((await productsRes.json()).products ?? []);
     setSessions((await sessionsRes.json()).sessions ?? []);
+    setInterest((await interestRes.json()).entries ?? []);
     setLoading(false);
   }, [router]);
 
@@ -320,6 +334,13 @@ export default function DashboardPage() {
           className={`vm-tab ${tab === "sessions" ? "is-active" : ""}`}
         >
           Sessions ({sessions.length})
+        </button>
+        <button
+          type="button"
+          onClick={() => setTab("interest")}
+          className={`vm-tab ${tab === "interest" ? "is-active" : ""}`}
+        >
+          Enquiries ({interest.length})
         </button>
       </nav>
 
@@ -566,6 +587,59 @@ export default function DashboardPage() {
                   )}
                 </li>
               ))}
+            </ul>
+          )}
+        </section>
+      )}
+
+      {tab === "interest" && (
+        <section className="vm-section">
+          <h2 className="vm-h2">From the site</h2>
+          <p className="vm-hint">
+            What people sent through the site. Manufacturers first — what they
+            make and what counterfeits have cost them is the part worth
+            reading.
+          </p>
+
+          {interest.length === 0 ? (
+            <p className="vm-empty">Nothing has come in yet.</p>
+          ) : (
+            <ul className="vm-list">
+              {interest
+                .slice()
+                .sort((a, b) =>
+                  a.kind === b.kind ? 0 : a.kind === "manufacturer" ? -1 : 1
+                )
+                .map((item) => (
+                  <li key={item.id} className="vm-card vm-item">
+                    <div className="vm-item-main">
+                      <h3 className="vm-item-model">
+                        {item.company ?? item.email}
+                      </h3>
+                      <p className="vm-item-desc">
+                        {item.kind === "manufacturer"
+                          ? `${item.contact_name} · ${item.email}`
+                          : "On the updates list"}
+                      </p>
+                      {item.parts_made && (
+                        <p className="vm-item-desc">Makes: {item.parts_made}</p>
+                      )}
+                      {item.problem && (
+                        <p className="vm-item-desc">{item.problem}</p>
+                      )}
+                      <div className="vm-item-meta">
+                        <span className="vm-chip">
+                          {item.kind === "manufacturer"
+                            ? "Manufacturer"
+                            : "Updates"}
+                        </span>
+                        <span className="vm-count">
+                          {formatWhen(item.created_at)}
+                        </span>
+                      </div>
+                    </div>
+                  </li>
+                ))}
             </ul>
           )}
         </section>
