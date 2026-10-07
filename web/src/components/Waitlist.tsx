@@ -9,7 +9,8 @@
  * back to them. Both open in a panel so neither one pushes the page around.
  */
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import Turnstile from "@/components/Turnstile";
 
 const CORAL = "#f73962";
 const WINE = "#500414";
@@ -33,10 +34,16 @@ function Dialog({
 }) {
   const box = useRef<HTMLDivElement | null>(null);
 
+  // Held in a ref so this effect runs once per open. With onClose in the
+  // dependency list it re-ran on every render — every keystroke — and the
+  // focus call below yanked the caret back to the first field.
+  const closeRef = useRef(onClose);
+  closeRef.current = onClose;
+
   useEffect(() => {
     // Escape closes, and the page behind does not scroll while this is open.
     function onKey(event: KeyboardEvent) {
-      if (event.key === "Escape") onClose();
+      if (event.key === "Escape") closeRef.current();
     }
 
     const previous = document.body.style.overflow;
@@ -49,7 +56,7 @@ function Dialog({
       document.body.style.overflow = previous;
       document.removeEventListener("keydown", onKey);
     };
-  }, [onClose]);
+  }, []);
 
   return (
     <div
@@ -107,11 +114,17 @@ export default function Waitlist() {
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState(false);
   const [error, setError] = useState("");
+  const [token, setToken] = useState("");
+
+  // Stable identity, so the widget is not torn down and rebuilt on every
+  // keystroke in the form.
+  const handleToken = useCallback((value: string) => setToken(value), []);
 
   function open(which: Panel) {
     setPanel(which);
     setDone(false);
     setError("");
+    setToken("");
   }
 
   async function send(kind: "waitlist" | "manufacturer") {
@@ -124,8 +137,16 @@ export default function Waitlist() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(
           kind === "waitlist"
-            ? { kind, email }
-            : { kind, email, company, contactName, partsMade, problem }
+            ? { kind, email, turnstileToken: token }
+            : {
+                kind,
+                email,
+                company,
+                contactName,
+                partsMade,
+                problem,
+                turnstileToken: token,
+              }
         ),
       });
 
@@ -211,6 +232,8 @@ export default function Waitlist() {
                     style={field}
                   />
                 </label>
+
+                <Turnstile onToken={handleToken} />
 
                 <button
                   type="submit"
@@ -329,6 +352,8 @@ export default function Waitlist() {
                     style={field}
                   />
                 </label>
+
+                <Turnstile onToken={handleToken} />
 
                 <button
                   type="submit"

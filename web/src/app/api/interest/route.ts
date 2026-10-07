@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { requireUser } from "@/lib/session";
 import { recordInterest, listInterest } from "@backend/services/interest";
+import { verifyTurnstile } from "@backend/services/turnstile";
 
 /**
  * Manufacturers asking for access.
@@ -24,6 +25,10 @@ export async function POST(request: NextRequest) {
     request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? undefined;
 
   try {
+    // Checked before anything is written, so a failed challenge never leaves
+    // a row behind.
+    await verifyTurnstile(body.turnstileToken, sourceIp);
+
     await recordInterest({
       kind: body.kind === "waitlist" ? "waitlist" : "manufacturer",
       company: body.company as string,
