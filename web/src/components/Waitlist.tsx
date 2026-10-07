@@ -246,9 +246,9 @@ export default function Waitlist() {
           ) : (
             <>
               <p className="mt-5 text-lg font-medium leading-relaxed">
-                Veymark is for manufacturers whose parts get copied. Nothing has
-                shipped yet — we are talking to the people who have the problem
-                before we build anything around a guess.
+                If your parts get copied and sold under your brand, we want
+                to hear from you. Veymark is not for sale yet, and we would
+                rather talk to you now than guess what you need.
               </p>
 
               <form
