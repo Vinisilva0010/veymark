@@ -3555,3 +3555,18 @@ body.vm-dash-page {
 .sl-scene[data-phase="1"] .sl-caption-sealed { opacity: 1; }
 .sl-scene[data-phase="2"] .sl-caption-torn { opacity: 1; }
 .sl-scene[data-phase="3"] .sl-caption-inside { opacity: 1; }
+
+/* Scroll cue under the home buttons. Movement is what makes it read as an
+   instruction rather than decoration. */
+.vm-scroll-arrow {
+  font-size: 22px;
+  line-height: 1;
+  animation: vm-scroll-nudge 1.8s ease-in-out infinite;
+}
+@keyframes vm-scroll-nudge {
+  0%, 100% { transform: translateY(0); opacity: 0.55; }
+  50% { transform: translateY(7px); opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .vm-scroll-arrow { animation: none; opacity: 1; }
+}

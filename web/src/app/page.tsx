@@ -5,6 +5,7 @@ import About from "@/components/About";
 import Footer from "@/components/Footer";
 import Faq from "@/components/Faq";
 import Waitlist from "@/components/Waitlist";
+import VideoPanel from "@/components/VideoPanel";
 export default function Home() {
   return (
     <main className="relative">
@@ -28,6 +29,7 @@ export default function Home() {
         </div>
       </section>
 
+                  <VideoPanel />
                   <VerifyStates />
                   <About />
                         <Faq />
