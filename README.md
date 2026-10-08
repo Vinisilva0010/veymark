@@ -57,6 +57,24 @@ keys, forged signatures and tampered payloads are rejected. It does not prove
 the byte layout matches a real chip. When hardware enters the project, only the
 generation side is replaced.
 
+## Sealed parts
+
+A tag on a battery proves the case. It says nothing about the cells inside, so
+a workshop can open the case, swap the internals and close it again with the
+tag still reading as authentic.
+
+Two things answer that. The tag is applied across the opening, so opening the
+case tears the antenna and the part stops answering. The position is recorded,
+because a part sealed across the opening but recorded as a surface tag would
+tell the buyer a torn antenna proves nothing — an unrecognised position is
+refused rather than assumed.
+
+The components inside carry their own tags, recorded as belonging to that case.
+A product declares what belongs inside it and which product fills each slot, so
+attaching the wrong part is refused rather than recorded. A slot cannot be
+removed once real parts are recorded in it: that would erase the record of what
+is inside cases already shipped.
+
 ## Verification states
 
 Three states, and the second is a deliberate product decision:
@@ -99,6 +117,21 @@ explorer with DAS support to inspect passports.
 
 ## Layout
 
+```
+programs/veymark/      Anchor program (manufacturer registry)
+backend/
+  migrations/          001 to 010
+  src/crypto/          SUN generation and verification, key encryption
+  src/services/        auth, catalog, verify, onchain, minting,
+                       provisioning, assembly, interest
+  tests/               sun, crypto, assembly, seal-position, catalog-assembly
+web/
+  src/app/             landing, /v, /demo, /dashboard, /api/*
+  src/components/      landing and demo
+scripts/               create-tree, mint-passport, seed-catalog,
+                       seed-demo-parts, simulate-tap, provision-test-part
+```
+
 ## Running locally
 
 Requires PostgreSQL, Node 22 and a Solana devnet keypair.
@@ -106,8 +139,7 @@ Requires PostgreSQL, Node 22 and a Solana devnet keypair.
 ```bash
 pnpm install
 cp .env.example .env          # fill in SOLANA_RPC_URL, DATABASE_URL, SDM_MASTER_KEY
-psql "$DATABASE_URL" -f backend/migrations/001_initial_schema.sql
-psql "$DATABASE_URL" -f backend/migrations/002_auth.sql
+for f in backend/migrations/*.sql; do psql "$DATABASE_URL" -f "$f"; done
 npx ts-node scripts/seed-catalog.ts
 cd web && npm run dev
 ```
@@ -115,7 +147,7 @@ cd web && npm run dev
 On WSL, PostgreSQL does not start automatically (no systemd). Start it with:
 
 ```bash
-sudo pg_ctlcluster 16 main start && pg_isready
+sudo service postgresql start && pg_isready
 ```
 
 `SDM_MASTER_KEY` must be 32 random bytes as 64 hex characters
@@ -124,13 +156,19 @@ dump alone cannot forge taps.
 
 ## Tests
 
+61 tests, most of them rejection cases.
+
 ```bash
-npx ts-node backend/tests/sun.test.ts       # SUN cryptography, 14 assertions
-npx ts-node backend/tests/crypto.test.ts    # key encryption roundtrip and tamper rejection
-anchor test --skip-deploy                   # on-chain program, 11 assertions
+npx ts-node backend/tests/sun.test.ts              # SUN cryptography, 14
+npx ts-node backend/tests/crypto.test.ts           # key encryption, tamper rejection
+npx ts-node backend/tests/assembly.test.ts         # sealed assemblies, 17
+npx ts-node backend/tests/seal-position.test.ts    # seal position validation, 7
+npx ts-node backend/tests/catalog-assembly.test.ts # slot declarations, 12
+anchor test --skip-deploy                          # on-chain program, 11
 ```
 
 ## Status
 
-Nothing has shipped. Everything runs on devnet, tags are simulated, and the
-landing page says so.
+Nothing has shipped. Everything runs on devnet and tags are simulated. The tags
+have been sourced and we know where to buy them; none have been ordered. The
+landing page says all of this.
