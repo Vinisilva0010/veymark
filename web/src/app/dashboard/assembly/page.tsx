@@ -167,9 +167,11 @@ export default function AssemblyPage() {
 
       {!lockedUid ? (
         <section className="vm-section">
-          <h2 className="vm-h2">Open a case</h2>
+          <h2 className="vm-h2">Step 1 — read the case</h2>
           <p className="vm-hint">
-            Hold the case tag against the reader. Its number fills the field.
+            Hold the tag on the outside of the case against the reader. This is
+            the part that holds the others — a battery pack, a control module.
+            Its contents are recorded in the next step.
           </p>
 
           <form onSubmit={handleLock} className="vm-card vm-form">
@@ -239,7 +241,9 @@ export default function AssemblyPage() {
           {state && !state.complete && (
             <form onSubmit={handleAttach} className="vm-card vm-form">
               <label className="vm-field">
-                <span className="vm-label">Component chip UID</span>
+                <span className="vm-label">
+                  Step 2 — read the part going inside
+                </span>
                 <input
                   ref={componentInput}
                   value={componentUid}
@@ -254,7 +258,7 @@ export default function AssemblyPage() {
               </label>
 
               <label className="vm-field">
-                <span className="vm-label">Goes in as</span>
+                <span className="vm-label">Step 3 — what it goes in as</span>
                 <select
                   value={role}
                   onChange={(e) => setRole(e.target.value)}
