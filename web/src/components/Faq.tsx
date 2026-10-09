@@ -9,6 +9,14 @@ const WINE = "#500414";
 
 const ITEMS = [
   {
+    q: "Why not a QR code or a hologram?",
+    a: "Every authenticity label on the market today is visual, and anything you can see you can photograph and print again. The Veymark chip holds a secret that never appears on any screen: it proves it has the key without ever showing it, so there is nothing to copy. The passport on Solana then proves the record was not changed after the part left the line.",
+  },
+  {
+    q: "What about a part that can be opened and have its insides swapped?",
+    a: "That is the first thing people from the industry raise: a battery with the original housing and a different cell inside. Two things answer it. The tag is applied across the opening of the part, so opening it breaks the antenna and the tag stops responding. And for parts like that, the manufacturer records which components are inside, each with its own tag, so the verification screen shows what should be in there.",
+  },
+  {
     q: "What happens if someone clones the chip?",
     a: "A genuine NXP chip carries a factory signature the phone checks before anything else runs, so a cheap clone fails immediately. Cloning the silicon itself means fabricating authentic NXP parts — that is not a counterfeiter with a printer, that is a semiconductor operation. And even then, each tap must produce a code that has never been used; replaying a captured one fails.",
   },
@@ -34,7 +42,7 @@ const ITEMS = [
   },
   {
     q: "Where can I see it working?",
-    a: "Nothing has shipped. The chips are renders and the transactions are on devnet while we build. We publish progress as it happens rather than after — what's on the site is the state of the work, not a promise about it.",
+    a: "The demo is at veymark.xyz/demo. It runs the factory writing a tag, a workshop verifying a part, and three attacks — a reprinted label, a replayed tap, an opened part — each one failing in front of you. It runs against the real system, on devnet. What does not exist yet is physical tags: the chips are renders and a simulator produces the same payloads. Nothing has shipped and nobody has tested it in the field.",
   },
 ];
 

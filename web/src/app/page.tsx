@@ -13,11 +13,9 @@ export default function Home() {
         <div className="grid w-full grid-cols-1 items-center gap-10 md:grid-cols-2">
           <div>
             <ParticleTitle />
-                      <p className="mt-8 max-w-xl text-xl font-medium leading-snug text-[#500414] md:text-2xl">
-              Every authenticity label on the market can be defeated with a
-              camera and a printer. Veymark puts a cryptographic chip on the
-              part and its passport on Solana. The secret never appears on any
-              screen, so there is nothing to photograph.
+                     <p className="mt-8 max-w-xl text-xl font-medium leading-snug text-[#500414] md:text-2xl">
+              Car parts you can verify by tapping your phone. Chip on the part,
+              passport on Solana.
             </p>
 
             <Waitlist />
