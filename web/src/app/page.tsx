@@ -4,6 +4,7 @@ import VerifyStates from "@/components/VerifyStates";
 import About from "@/components/About";
 import Footer from "@/components/Footer";
 import Faq from "@/components/Faq";
+import FaqSchema from "@/components/FaqSchema";
 import Waitlist from "@/components/Waitlist";
 import VideoPanel from "@/components/VideoPanel";
 export default function Home() {
@@ -30,6 +31,7 @@ export default function Home() {
                   <VideoPanel />
                   <VerifyStates />
                   <About />
+                        <FaqSchema />
                         <Faq />
                         <Footer />
                               

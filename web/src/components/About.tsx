@@ -82,6 +82,39 @@ export default function About() {
           secret inside the part that never appears on any screen, and proves it
           exists on every single tap.
         </p>
+
+        {/* Numbers with their source. An unsourced figure is a claim; a
+            sourced one is something a reader — or a search engine — can
+            check, and it is the single cheapest thing a small site can do
+            to be quoted rather than skipped. */}
+        <div className="mt-12 grid max-w-3xl gap-6 sm:grid-cols-3">
+          <div>
+            <p className="text-3xl font-bold md:text-4xl" style={{ color: WINE }}>
+              USD 467bn
+            </p>
+            <p className="mt-2 text-base font-semibold" style={{ color: WINE }}>
+              counterfeit goods in world trade, per the OECD and the EU
+              Intellectual Property Office
+            </p>
+          </div>
+          <div>
+            <p className="text-3xl font-bold md:text-4xl" style={{ color: WINE }}>
+              EUR 4.3bn
+            </p>
+            <p className="mt-2 text-base font-semibold" style={{ color: WINE }}>
+              lost to counterfeit car parts in the European Union every year
+            </p>
+          </div>
+          <div>
+            <p className="text-3xl font-bold md:text-4xl" style={{ color: WINE }}>
+              2.5–3.5%
+            </p>
+            <p className="mt-2 text-base font-semibold" style={{ color: WINE }}>
+              of a carmaker&apos;s revenue already goes to warranty, before
+              counting parts that are not theirs
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* Three proofs */}

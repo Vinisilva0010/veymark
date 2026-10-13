@@ -1,0 +1,38 @@
+# Veymark
+
+> Per-unit identity for car parts. A cryptographic chip on the part proves itself without exposing its key, and each unit gets a passport minted on Solana. A mechanic taps the part with a phone before fitting it and sees whether it is genuine, who made it, and what is inside it — no app, no wallet, no account.
+
+Veymark is built by two founders: one with 22 years at GM Brazil in product and materials engineering, approving parts before they went into the car; one building the cryptography and the Solana program.
+
+Status as of October 2026: nothing has shipped. The system runs end to end on Solana devnet with 61 tests. There are no physical tags yet — a simulator produces the same SUN payloads a real NXP NTAG 424 DNA chip would, with the same cryptography and the same format. It has not been validated against physical silicon.
+
+## The problem
+
+Every anti-counterfeiting label in common use is visual: QR codes, serial numbers, holograms. Anything visible can be photographed and reprinted, so the defence holds until someone with a camera copies it.
+
+When a counterfeit part fails, the manufacturer pays. They cannot prove the part did not come from their factory, so they cover the warranty on something they never made. Warranty already costs a carmaker between 2.5% and 3.5% of revenue, before counting parts that are not theirs.
+
+Counterfeit goods account for USD 467 billion of world trade (OECD/EUIPO). In auto parts in Europe alone, EUR 4.3 billion a year.
+
+## How it works
+
+Three independent proofs:
+
+- Proof of silicon. A genuine NXP chip carries a factory signature the phone verifies locally, with no server involved.
+- Proof of touch. The chip emits a SUN message on every tap: UID and a read counter encrypted with AES-128, signed with a truncated CMAC. A captured payload replayed later is rejected by the counter.
+- Proof in the open. Each part is minted as a compressed NFT on Solana. Anyone can read that record in a block explorer and check it against the manufacturer's public wallet.
+
+## Sealed parts
+
+A tag on a battery proves the case and says nothing about the cells inside. Two things answer that: the tag is applied across the opening, so opening the case tears the antenna; and the components inside carry their own tags, recorded as belonging to that case. A product declares which product fills each slot, so attaching the wrong part is refused rather than recorded.
+
+## What Veymark does not claim
+
+Veymark is not impossible to counterfeit, and the project does not say it is. Any verification screen can be cloned. What the chip removes is the cheap attack — photograph the label, reprint it — leaving only an expensive, traceable operation.
+
+## Links
+
+- [Site](https://www.veymark.xyz): what the product is and how verification works.
+- [Demo](https://www.veymark.xyz/demo): the factory writing a tag, a workshop verifying a part, and three attacks running live against the deployed system.
+- [Source code](https://github.com/Vinisilva0010/veymark): Anchor program, tag cryptography, backend and frontend.
+- [Colosseum project page](https://colosseum.com/arena/projects/veymark): hackathon submission with pitch video.
