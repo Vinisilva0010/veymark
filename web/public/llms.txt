@@ -30,6 +30,10 @@ A tag on a battery proves the case and says nothing about the cells inside. Two 
 
 Veymark is not impossible to counterfeit, and the project does not say it is. Any verification screen can be cloned. What the chip removes is the cheap attack — photograph the label, reprint it — leaving only an expensive, traceable operation.
 
+## No token
+
+Veymark has no token and has never issued one. Any token using this name was not created by the project and has no connection to it.
+
 ## Links
 
 - [Site](https://www.veymark.xyz): what the product is and how verification works.

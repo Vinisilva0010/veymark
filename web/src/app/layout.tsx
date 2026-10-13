@@ -41,7 +41,7 @@ export const metadata: Metadata = {
       "A cryptographic chip on each car part and a passport minted per unit on Solana. Tap a phone to the part and see if it is genuine.",
     images: [
       {
-        url: "/images/logo.png",
+        url: "/images/og-image.png",
         width: 1200,
         height: 630,
         alt: "Veymark",
@@ -56,7 +56,7 @@ export const metadata: Metadata = {
     title: "Veymark — Car parts you can verify by tapping your phone",
     description:
       "A cryptographic chip on each car part and a passport minted per unit on Solana.",
-    images: ["/images/logo.png"],
+    images: ["/images/og-image.png"],
   },
 
   robots: {

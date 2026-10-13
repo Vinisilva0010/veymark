@@ -131,7 +131,7 @@ export default function Footer() {
           className="mt-10 flex flex-col items-center gap-3 border-t pt-6 text-xs md:flex-row md:justify-between"
           style={{ borderColor: "rgba(253,249,235,0.16)" }}
         >
-          <span style={{ color: "rgba(253,249,235,0.55)" }}>
+          <span style={{ color: "rgba(253,249,235,0.92)" }}>
             Veymark · Built on Solana
           </span>
 
@@ -144,10 +144,18 @@ export default function Footer() {
             </a>
           </nav>
 
-          <span style={{ color: "rgba(253,249,235,0.4)" }}>
+          <span style={{ color: "rgba(253,249,235,0.92)" }}>
             Devnet. Nothing shipped yet.
           </span>
         </div>
+
+        <p
+          className="mt-6 text-center text-xs font-semibold md:text-left"
+          style={{ color: "rgba(253,249,235,0.92)" }}
+        >
+          Veymark has no token and has never issued one. Any token using this
+          name was not created by us and has no connection to this project.
+        </p>
       </div>
 
       <style jsx global>{`
