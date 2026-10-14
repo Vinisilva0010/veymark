@@ -2,7 +2,7 @@
 title: "Who pays when a counterfeit part fails"
 description: "The manufacturer whose name is printed on the fake covers the warranty on a part they never made. Here is how that bill reaches them and why they cannot refuse it."
 summary: "A counterfeit part carries a brand name, so when it fails the claim goes to that brand. The manufacturer inspects the part, cannot prove it did not come from their factory, and pays. Warranty already costs a carmaker between 2.5 and 3.5 percent of revenue before counting parts that were never theirs, and without a record per unit a recall cannot isolate which vehicles are affected."
-date: "2026-10-16"
+date: "2026-10-14"
 cover: "/images/blog/who-pays.png"
 coverAlt: "A broken part with an arrow pointing back to a factory"
 faq:

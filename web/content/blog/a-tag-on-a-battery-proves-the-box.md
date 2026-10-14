@@ -2,7 +2,7 @@
 title: "A tag on a battery proves the box, not what is inside it"
 description: "A sealed part can be opened, have its internals swapped, and closed again with the original tag still reading as authentic. Here is what closes that gap."
 summary: "Authentication on a sealed part proves the case and nothing else. A workshop can open a battery, replace the cells with cheaper ones, close it, and the tag on the outside still answers correctly. Two things fix it: the tag goes across the opening so that opening it tears the antenna, and the components inside are recorded with tags of their own."
-date: "2026-10-15"
+date: "2026-10-14"
 cover: "/images/blog/tag-on-a-battery.png"
 coverAlt: "A battery case with a tag across its opening, and the cells inside"
 faq:
