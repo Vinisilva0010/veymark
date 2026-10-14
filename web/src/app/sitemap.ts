@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { getAllPosts } from "@/lib/blog";
 
 const SITE = "https://www.veymark.xyz";
 
@@ -22,5 +23,17 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "weekly",
       priority: 0.8,
     },
+    {
+      url: `${SITE}/blog`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.8,
+    },
+    ...getAllPosts().map((post) => ({
+      url: `${SITE}/blog/${post.slug}`,
+      lastModified: new Date(post.updated ?? post.date),
+      changeFrequency: "monthly" as const,
+      priority: 0.7,
+    })),
   ];
 }

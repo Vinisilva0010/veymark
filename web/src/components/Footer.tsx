@@ -142,6 +142,9 @@ export default function Footer() {
             <a href="#faq" className="vm-foot-link">
               FAQ
             </a>
+            <a href="/blog" className="vm-foot-link">
+              Blog
+            </a>
           </nav>
 
           <span style={{ color: "rgba(253,249,235,0.92)" }}>

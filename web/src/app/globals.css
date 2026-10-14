@@ -3570,3 +3570,59 @@ body.vm-dash-page {
 @media (prefers-reduced-motion: reduce) {
   .vm-scroll-arrow { animation: none; opacity: 1; }
 }
+
+/* Blog article body. Markdown comes out as plain tags, so the spacing and
+   weight are set here. Text stays dark and heavy: an article is read start
+   to finish, and thin grey type is what makes people stop halfway. */
+.vm-prose {
+  color: #500414;
+}
+.vm-prose p {
+  margin-top: 1.5rem;
+  font-size: 1.125rem;
+  font-weight: 500;
+  line-height: 1.75;
+}
+.vm-prose h2 {
+  margin-top: 3rem;
+  font-size: 1.875rem;
+  font-weight: 700;
+  line-height: 1.2;
+  scroll-margin-top: 6rem;
+}
+.vm-prose h3 {
+  margin-top: 2.25rem;
+  font-size: 1.375rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+.vm-prose ul,
+.vm-prose ol {
+  margin-top: 1.5rem;
+  padding-left: 1.5rem;
+  font-size: 1.125rem;
+  font-weight: 500;
+  line-height: 1.75;
+}
+.vm-prose ul { list-style: disc; }
+.vm-prose ol { list-style: decimal; }
+.vm-prose li { margin-top: 0.5rem; }
+.vm-prose a {
+  font-weight: 700;
+  text-decoration: underline;
+}
+.vm-prose strong { font-weight: 800; }
+.vm-prose table {
+  margin-top: 2rem;
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 1rem;
+}
+.vm-prose th,
+.vm-prose td {
+  padding: 0.75rem;
+  text-align: left;
+  border: 1px solid rgba(80, 4, 20, 0.2);
+  font-weight: 600;
+}
+.vm-prose th { font-weight: 800; background: rgba(80, 4, 20, 0.05); }

@@ -38,5 +38,6 @@ Veymark has no token and has never issued one. Any token using this name was not
 
 - [Site](https://www.veymark.xyz): what the product is and how verification works.
 - [Demo](https://www.veymark.xyz/demo): the factory writing a tag, a workshop verifying a part, and three attacks running live against the deployed system.
+- [Blog](https://www.veymark.xyz/blog): how counterfeit parts reach the market, what they cost the manufacturer whose name is on them, and what per-part identity changes.
 - [Source code](https://github.com/Vinisilva0010/veymark): Anchor program, tag cryptography, backend and frontend.
 - [Colosseum project page](https://colosseum.com/arena/projects/veymark): hackathon submission with pitch video.

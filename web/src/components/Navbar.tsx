@@ -10,9 +10,13 @@ const WINE = "#500414";
 const CREAM = "#fdf9eb";
 // ---------------
 
+// Anchors are written with the path in front so they work from anywhere.
+// On the home page the browser just jumps to the section; from a blog post it
+// loads the home page and then jumps, instead of doing nothing at all.
 const LINKS = [
-  { label: "About", href: "#about" },
-  { label: "FAQ", href: "#faq" },
+  { label: "About", href: "/#about" },
+  { label: "FAQ", href: "/#faq" },
+  { label: "BLOG", href: "/blog" },
   { label: "DEMO", href: "/demo" },
 ];
 
@@ -76,7 +80,7 @@ export default function Navbar() {
       <div className="pointer-events-auto mx-auto flex max-w-6xl items-center">
         {/* Seal, breaking out of the capsule on the left. */}
         
-         <a href="#top"
+         <a href="/"
           className="relative z-10 -mr-7 block w-14 shrink-0 md:w-16"
           aria-label="Veymark, home"
         >
