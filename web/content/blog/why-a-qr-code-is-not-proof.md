@@ -17,7 +17,7 @@ faq:
 sources:
   - label: "OECD and EUIPO, Global Trade in Fakes"
     url: "https://www.oecd.org/en/publications/global-trade-in-fakes_74c81154-en.html"
-related: []
+related: ["a-tag-on-a-battery-proves-the-box"]
 ---
 
 A counterfeit brake pad passes the same test a genuine one does. Both carry a label, and the label is a QR code, a serial number or a hologram. All three are things you look at, and anything you can look at, you can photograph and print again.
