@@ -5,6 +5,7 @@ import About from "@/components/About";
 import Footer from "@/components/Footer";
 import Faq from "@/components/Faq";
 import FaqSchema from "@/components/FaqSchema";
+import LatestPosts from "@/components/LatestPosts";
 import Waitlist from "@/components/Waitlist";
 import VideoPanel from "@/components/VideoPanel";
 export default function Home() {
@@ -33,6 +34,7 @@ export default function Home() {
                   <About />
                         <FaqSchema />
                         <Faq />
+                        <LatestPosts />
                         <Footer />
                               
     </main>
